@@ -61,7 +61,7 @@ func (rt *roomTable) removeLocked(rid string, cid string) {
 		}
 	}
 }
-
+// 将消息转发到房间。如果房间不存在，它将创建一个。
 // send forwards the message to the room. If the room does not exist, it will create one.
 func (rt *roomTable) send(rid string, srcID string, msg string) error {
 	rt.lock.Lock()
@@ -70,7 +70,7 @@ func (rt *roomTable) send(rid string, srcID string, msg string) error {
 	r := rt.roomLocked(rid)
 	return r.send(srcID, msg)
 }
-
+//register将注册请求转发到房间。如果房间不存在，它将创建一个。
 // register forwards the register request to the room. If the room does not exist, it will create one.
 func (rt *roomTable) register(rid string, cid string, rwc io.ReadWriteCloser) error {
 	rt.lock.Lock()

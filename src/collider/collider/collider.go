@@ -96,6 +96,8 @@ func (c *Collider) httpStatusHandler(w http.ResponseWriter, r *http.Request) {
 // The request must have a form value "msg", which is the message to send.
 // DELETE request to path "/$ROOMID/$CLIENTID" is used to delete all records of a client, including the queued message from the client.
 // "OK" is returned if the request is valid.
+// POST请求路径“/$ROOMID/$CLIENTID”用于向房间的其他客户端发送消息。
+// 删除对路径“/$ROOMID/$CLIENTID”的请求用于删除客户端的所有记录，包括来自客户端的排队消息
 func (c *Collider) httpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.Header().Add("Access-Control-Allow-Methods", "POST, DELETE")
@@ -105,6 +107,7 @@ func (c *Collider) httpHandler(w http.ResponseWriter, r *http.Request) {
 		c.httpError("Invalid path: "+html.EscapeString(r.URL.Path), w)
 		return
 	}
+	// 获取房间id和客户端id
 	rid, cid := p[1], p[2]
 
 	switch r.Method {
@@ -119,6 +122,7 @@ func (c *Collider) httpHandler(w http.ResponseWriter, r *http.Request) {
 			c.httpError("Empty request body", w)
 			return
 		}
+		// 推送消息
 		if err := c.roomTable.send(rid, cid, m); err != nil {
 			c.httpError("Failed to send the message: "+err.Error(), w)
 			return
