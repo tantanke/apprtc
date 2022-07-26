@@ -24,7 +24,7 @@ import analytics
 import analytics_page
 import compute_page
 import constants
-
+MAX_USER_COUNT = 3
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -396,11 +396,6 @@ def add_client_to_room(request, room_id, client_id, is_loopback):
     if memcache_client.cas(key, room, constants.ROOM_MEMCACHE_EXPIRATION_SEC):
       logging.info('Added client %s in room %s, retries = %d' \
           %(client_id, room_id, retries))
-
-      if room.get_occupancy() == 2:
-        analytics.report_event(analytics.EventType.ROOM_SIZE_2,
-                               room_id,
-                               host=request.host)
       success = True
       break
     else:
@@ -456,7 +451,7 @@ def save_message_from_client(host, room_id, client_id, message):
     if not room.has_client(client_id):
       logging.warning('Unknown client: ' + client_id)
       return {'error': constants.RESPONSE_UNKNOWN_CLIENT, 'saved': False}
-    if room.get_occupancy() > 1:
+    if room.get_occupancy() > MAX_USER_COUNT:
       return {'error': None, 'saved': False}
 
     client = room.get_client(client_id)
