@@ -282,10 +282,6 @@ def get_room_parameters(request, room_id, client_id, is_initiator):
 
   bypass_join_confirmation = 'BYPASS_JOIN_CONFIRMATION' in os.environ and \
       os.environ['BYPASS_JOIN_CONFIRMATION'] == 'True'
-  key = get_memcache_key_for_room(request.host_url, room_id)
-  memcache_client = memcache.Client()
-  room = memcache_client.gets(key)
-  occupancy = room.get_occupancy()
   params = {
     'header_message': constants.HEADER_MESSAGE,
     'error_messages': error_messages,
@@ -300,7 +296,7 @@ def get_room_parameters(request, room_id, client_id, is_initiator):
     'include_loopback_js' : include_loopback_js,
     'wss_url': wss_url,
     'wss_post_url': wss_post_url,
-    'room_user_count':occupancy,
+    'room_user_count':'any',
     'bypass_join_confirmation': json.dumps(bypass_join_confirmation),
     'version_info': json.dumps(get_version_info())
   }
