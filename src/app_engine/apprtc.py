@@ -300,7 +300,7 @@ def get_room_parameters(request, room_id, client_id, is_initiator):
     'include_loopback_js' : include_loopback_js,
     'wss_url': wss_url,
     'wss_post_url': wss_post_url,
-    'room_user_count':json.dumps(occupancy),
+    'room_user_count':occupancy,
     'bypass_join_confirmation': json.dumps(bypass_join_confirmation),
     'version_info': json.dumps(get_version_info())
   }
