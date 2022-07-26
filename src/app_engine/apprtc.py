@@ -282,7 +282,7 @@ def get_room_parameters(request, room_id, client_id, is_initiator):
 
   bypass_join_confirmation = 'BYPASS_JOIN_CONFIRMATION' in os.environ and \
       os.environ['BYPASS_JOIN_CONFIRMATION'] == 'True'
-  key = get_memcache_key_for_room(self.request.host_url, room_id)
+  key = get_memcache_key_for_room(request.host_url, room_id)
   memcache_client = memcache.Client()
   room = memcache_client.gets(key)
   occupancy = room.get_occupancy()
