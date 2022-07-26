@@ -387,7 +387,7 @@ def add_client_to_room(request, room_id, client_id, is_loopback):
     elif occupancy >= 2:
       is_initiator = True
       room.add_client(client_id, Client(is_initiator))
-    else:
+    elif occupancy == 1:
       is_initiator = False
       other_client = room.get_other_client(client_id)
       messages = other_client.messages
@@ -530,7 +530,7 @@ class JoinPage(webapp2.RequestHandler):
     client_id = generate_random(8)
     is_loopback = self.request.get('debug') == 'loopback'
     result = add_client_to_room(self.request, room_id, client_id, is_loopback)
-    key = get_memcache_key_for_room(request.host_url, room_id)
+    key = get_memcache_key_for_room(self.request.host_url, room_id)
     memcache_client = memcache.Client()
     room = memcache_client.gets(key)
     occupancy = room.get_occupancy()
