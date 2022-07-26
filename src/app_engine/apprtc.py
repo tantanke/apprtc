@@ -296,7 +296,6 @@ def get_room_parameters(request, room_id, client_id, is_initiator):
     'ice_server_transports': ice_server_transports,
     'include_loopback_js' : include_loopback_js,
     'wss_url': wss_url,
-    'test':'12313131',
     'wss_post_url': wss_post_url,
     'bypass_join_confirmation': json.dumps(bypass_join_confirmation),
     'version_info': json.dumps(get_version_info())
@@ -376,9 +375,6 @@ def add_client_to_room(request, room_id, client_id, is_loopback):
       room = memcache_client.gets(key)
 
     occupancy = room.get_occupancy()
-    if occupancy >= 2:
-      error = constants.RESPONSE_ROOM_FULL
-      break
     if room.has_client(client_id):
       error = constants.RESPONSE_DUPLICATE_CLIENT
       break
@@ -388,13 +384,15 @@ def add_client_to_room(request, room_id, client_id, is_loopback):
       room.add_client(client_id, Client(is_initiator))
       if is_loopback:
         room.add_client(constants.LOOPBACK_CLIENT_ID, Client(False))
+    elif occupancy >= 2:
+      is_initiator = True
+      room.add_client(client_id, Client(is_initiator))
     else:
       is_initiator = False
       other_client = room.get_other_client(client_id)
       messages = other_client.messages
       room.add_client(client_id, Client(is_initiator))
       other_client.clear_messages()
-
     if memcache_client.cas(key, room, constants.ROOM_MEMCACHE_EXPIRATION_SEC):
       logging.info('Added client %s in room %s, retries = %d' \
           %(client_id, room_id, retries))
@@ -532,6 +530,11 @@ class JoinPage(webapp2.RequestHandler):
     client_id = generate_random(8)
     is_loopback = self.request.get('debug') == 'loopback'
     result = add_client_to_room(self.request, room_id, client_id, is_loopback)
+    key = get_memcache_key_for_room(request.host_url, room_id)
+    memcache_client = memcache.Client()
+    room = memcache_client.gets(key)
+    occupancy = room.get_occupancy()
+    result["room_user_count"] = occupancy
     if result['error'] is not None:
       logging.info('Error adding client to room: ' + result['error'] + \
           ', room_state=' + result['room_state'])
