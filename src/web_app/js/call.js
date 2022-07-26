@@ -432,11 +432,11 @@ Call.prototype.startSignaling_ = function() {
           trace('Adding local stream.');
           this.pcClient_.addStream(this.localStream_);
         }
-        if (this.params_.isInitiator) {
+       /*  if (this.params_.isInitiator) {
           this.pcClient_.startAsCaller(this.params_.offerOptions);
         } else {
           this.pcClient_.startAsCallee(this.params_.messages);
-        }
+        } */
       }.bind(this))
       .catch(function(e) {
         this.onError_('Create PeerConnection exception: ' + e);
