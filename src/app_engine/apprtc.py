@@ -519,6 +519,12 @@ class JoinPage(webapp2.RequestHandler):
 
   def write_room_parameters(self, room_id, client_id, messages, is_initiator):
     params = get_room_parameters(self.request, room_id, client_id, is_initiator)
+    key = get_memcache_key_for_room(self.request.host_url, room_id)
+    memcache_client = memcache.Client()
+    room = memcache_client.gets(key)
+    occupancy = room.get_occupancy()
+    params['room_user_count'] = occupancy
+    params['room_user_count1'] = 'occupancy'
     self.write_response('SUCCESS', params, messages)
 
   def post(self, room_id):
