@@ -200,6 +200,7 @@ loop:
 			c.roomTable.send(rid, cid, msg.Msg)
 			break
 		default:
+			log.Println("未知错误！发送信息到服务器成功")
 			c.wsError("Invalid message: unexpected 'cmd'", ws)
 			break
 		}

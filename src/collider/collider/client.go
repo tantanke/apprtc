@@ -92,7 +92,9 @@ func (c *client) send(other *client, msg string) error {
 		return errors.New("Invalid client")
 	}
 	if other.rwc != nil {
+		log.Printf("客户端 %s 向 客户端 %s 发送信息成功", c.id, other.id)
 		return sendServerMsg(other.rwc, msg)
 	}
+	log.Printf("客户端 %s 把消息push进队列中", c.id)
 	return c.enqueue(msg)
 }
