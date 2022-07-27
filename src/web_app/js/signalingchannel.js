@@ -140,7 +140,7 @@ SignalingChannel.prototype.send = function(message) {
     return;
   }
   trace('C->WSS: ' + message);
-  console.error('发送消息！',msg.type)
+  console.error('发送消息！',message.type)
   var wssMessage = {
     cmd: 'send',
     msg: message
