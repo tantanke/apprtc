@@ -150,7 +150,7 @@ func (c *Collider) wsHandler(ws *websocket.Conn) {
 	var rid, cid string
 
 	registered := false
-
+	log.Printf("触发wsHandler")
 	var msg wsClientMsg
 loop:
 	for {

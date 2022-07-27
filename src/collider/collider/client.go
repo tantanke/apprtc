@@ -66,6 +66,7 @@ func (c *client) enqueue(msg string) error {
 	if len(c.msgs) >= maxQueuedMsgCount {
 		return errors.New("Too many messages queued for the client")
 	}
+	log.Printf("Client %s 压入消息 %s", c.id, msg)
 	c.msgs = append(c.msgs, msg)
 	return nil
 }

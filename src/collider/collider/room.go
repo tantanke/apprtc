@@ -88,12 +88,11 @@ func (rm *room) send(srcClientID string, msg string) error {
 	if err != nil {
 		return err
 	}
-
+	log.Printf("客户端%s进入send消息阶段",srcClientID)
 	// 等于一时暂存消息 等待其他发送
 	if len(rm.clients) == 1 {
 		return rm.clients[srcClientID].enqueue(msg)
 	}
-
 	// Send the message to the other client of the room.
 	for _, oc := range rm.clients {
 		if oc.id != srcClientID {
