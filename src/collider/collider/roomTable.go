@@ -66,7 +66,7 @@ func (rt *roomTable) removeLocked(rid string, cid string) {
 func (rt *roomTable) send(rid string, srcID string, msg string) error {
 	rt.lock.Lock()
 	defer rt.lock.Unlock()
-    log.Printf("send转发消息到 %s", rid)
+    log.Printf("创建room和send转发消息到 %s", rid)
 	r := rt.roomLocked(rid)
 	// 客户端ID 和 消息
 	return r.send(srcID, msg)
