@@ -435,7 +435,7 @@ Call.prototype.startSignaling_ = function() {
         if (this.params_.isInitiator) {
           this.pcClient_.startAsCaller(this.params_.offerOptions);
         } else {
-          console.log(messages,666666)
+          console.log(this.params_.messages,666666)
           this.pcClient_.startAsCallee(this.params_.messages);
         }
       }.bind(this))
