@@ -98,7 +98,8 @@ func (rm *room) send(srcClientID string, msg string) error {
 	for _, oc := range rm.clients {
 		if oc.id != srcClientID {
 			log.Printf("客户端%s 向 客户端%s 转发消息：%s", srcClientID,oc.id,msg)
-			src.send(oc, msg)
+			return src.send(oc, msg)
+			continue
 		}
 	}
 

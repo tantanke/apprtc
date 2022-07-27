@@ -224,7 +224,7 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
         // because it JSON.stringify won't include attributes which are on the
         // object's prototype chain. By creating the message to serialize
         // explicitly we can avoid the issue.
-        console.warn('发送本地sdp到信令服务器')
+        console.warn('准备发送本地sdp到信令服务器')
         this.onsignalingmessage({
           sdp: sessionDescription.sdp,
           type: sessionDescription.type
