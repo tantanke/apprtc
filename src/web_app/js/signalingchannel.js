@@ -59,8 +59,9 @@ SignalingChannel.prototype.open = function() {
     }.bind(this);
 
     this.websocket_.onmessage = function(event) {
-      trace('WSS->C: ' + event.data);
 
+      trace('WSS->C: ' + event.data);
+      console.warn('收到消息！！！！！！')
       var message = parseJSON(event.data);
       if (!message) {
         trace('Failed to parse WSS message: ' + event.data);
@@ -139,7 +140,7 @@ SignalingChannel.prototype.send = function(message) {
     return;
   }
   trace('C->WSS: ' + message);
-
+  console.error('发送消息！！！！！！')
   var wssMessage = {
     cmd: 'send',
     msg: message
