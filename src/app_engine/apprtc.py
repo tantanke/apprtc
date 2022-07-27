@@ -495,18 +495,19 @@ class MessagePage(webapp2.RequestHandler):
     message_json = self.request.body
     result = save_message_from_client(
         self.request.host_url, room_id, client_id, message_json)
+    self.send_message_to_collider(room_id, client_id, message_json)
     if result['error'] is not None:
       self.write_response(result['error'])
       return
-    if not result['saved']:
+    #if not result['saved']:
       # Other client joined, forward to collider. Do this outside the lock.
       # Note: this may fail in local dev server due to not having the right
       # certificate file locally for SSL validation.
       # Note: loopback scenario follows this code path.
       # TODO(tkchin): consider async fetch here.
-      self.send_message_to_collider(room_id, client_id, message_json)
-    else:
-      self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
+      
+    #else:
+      #self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
 
 class JoinPage(webapp2.RequestHandler):
   def write_response(self, result, params, messages):
