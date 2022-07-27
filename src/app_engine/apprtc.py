@@ -488,7 +488,8 @@ class MessagePage(webapp2.RequestHandler):
       # TODO(tkchin): better error handling.
       self.error(500)
       return
-    self.write_response('SUCCESS SEND TO COLLIDER')
+    self.write_response('SUCCESS SEND TO COLLIDER'+ room_id +
+                 ' client ' + client_id)
 
   def post(self, room_id, client_id):
     message_json = self.request.body

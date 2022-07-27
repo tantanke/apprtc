@@ -31,7 +31,7 @@ func (rt *roomTable) room(id string) *room {
 
 	return rt.roomLocked(id)
 }
-
+// roomLocked 在不获取锁的情况下获取或创建房间。当调用者已经获得锁时使用
 // roomLocked gets or creates the room without acquiring the lock. Used when the caller already acquired the lock.
 func (rt *roomTable) roomLocked(id string) *room {
 	if r, ok := rt.rooms[id]; ok {

@@ -184,7 +184,7 @@ loop:
 			}
 			registered, rid, cid = true, msg.RoomID, msg.ClientID
 			c.dash.incrWs()
-
+			log.Println("成功注册服务到房间")
 			defer c.roomTable.deregister(rid, cid)
 			break
 		case "send":
@@ -196,6 +196,7 @@ loop:
 				c.wsError("Invalid send request: missing 'msg'", ws)
 				break loop
 			}
+			log.Println("发送信息到服务器成功")
 			c.roomTable.send(rid, cid, msg.Msg)
 			break
 		default:

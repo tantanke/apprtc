@@ -34,6 +34,7 @@ func (rm *room) client(clientID string) (*client, error) {
 	if c, ok := rm.clients[clientID]; ok {
 		return c, nil
 	}
+	// 判断是否超出限制
 	if len(rm.clients) >= maxRoomCapacity {
 		log.Printf("Room %s is full, not adding client %s", rm.id, clientID)
 		return nil, errors.New("Max room capacity reached")
@@ -47,6 +48,7 @@ func (rm *room) client(clientID string) (*client, error) {
 			}
 		})
 	}
+	// 注册信息
 	rm.clients[clientID] = newClient(clientID, timer)
 
 	log.Printf("Added client %s to room %s", clientID, rm.id)
@@ -65,11 +67,16 @@ func (rm *room) register(clientID string, rwc io.ReadWriteCloser) error {
 	}
 
 	log.Printf("Client %s registered in room %s", clientID, rm.id)
-
+	// 注册的时候会分发消息
 	// Sends the queued messages from the other client of the room.
 	if len(rm.clients) > 1 {
 		for _, otherClient := range rm.clients {
 			otherClient.sendQueued(c)
+		}
+	}
+	if len(rm.clients) > 2 {
+		for _, otherClient := range rm.clients {
+			c.sendQueued(otherClient)
 		}
 	}
 	return nil
