@@ -69,7 +69,7 @@ func (rm *room) register(clientID string, rwc io.ReadWriteCloser) error {
 	log.Printf("Client %s registered in room %s", clientID, rm.id)
 	// 注册的时候会分发消息
 	// Sends the queued messages from the other client of the room.
-	if len(rm.clients) > 1 {
+	if len(rm.clients) == 2 {
 		for _, otherClient := range rm.clients {
 			otherClient.sendQueued(c)
 		}
