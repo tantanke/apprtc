@@ -76,6 +76,7 @@ func (c *client) sendQueued(other *client) error {
 		return errors.New("Invalid client")
 	}
 	for _, m := range c.msgs {
+		log.Printf("Client %s send messages %s", c.id, m)
 		sendServerMsg(other.rwc, m)
 	}
 	c.msgs = nil
