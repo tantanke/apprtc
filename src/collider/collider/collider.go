@@ -184,7 +184,7 @@ loop:
 			}
 			registered, rid, cid = true, msg.RoomID, msg.ClientID
 			c.dash.incrWs()
-			log.Println("客户端%s 成功注册ws服务到房间 %s",msg.ClientID,msg.RoomID)
+			log.Println("客户端%s成功注册ws服务到房间%s",msg.ClientID,msg.RoomID)
 			defer c.roomTable.deregister(rid, cid)
 			break
 		case "send":
