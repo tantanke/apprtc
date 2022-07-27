@@ -488,7 +488,7 @@ class MessagePage(webapp2.RequestHandler):
       # TODO(tkchin): better error handling.
       self.error(500)
       return
-    self.write_response(constants.RESPONSE_SUCCESS)
+    self.write_response('SUCCESS SEND TO COLLIDER')
 
   def post(self, room_id, client_id):
     message_json = self.request.body
@@ -505,7 +505,7 @@ class MessagePage(webapp2.RequestHandler):
       # TODO(tkchin): consider async fetch here.
       self.send_message_to_collider(room_id, client_id, message_json)
     else:
-      self.write_response(constants.RESPONSE_SUCCESS)
+      self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
 
 class JoinPage(webapp2.RequestHandler):
   def write_response(self, result, params, messages):
@@ -524,7 +524,6 @@ class JoinPage(webapp2.RequestHandler):
     room = memcache_client.gets(key)
     occupancy = room.get_occupancy()
     params['room_user_count'] = occupancy
-    params['room_user_count1'] = 'occupancy'
     self.write_response('SUCCESS', params, messages)
 
   def post(self, room_id):
