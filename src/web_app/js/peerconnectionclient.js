@@ -21,7 +21,6 @@
 // TODO(jansson) disabling for now since we are going replace JSHINT.
 // (It does not say where the strict violation is hence it's not worth fixing.).
 // jshint strict:false
-
 'use strict';
 
 var PeerConnectionClient = function (params, startTime) {
@@ -136,7 +135,8 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages,connect
 
 PeerConnectionClient.prototype.receiveSignalingMessage = function (message) {
   var messageObj = parseJSON(message);
-  if (!messageObj) {
+  if (!messageObj || ['all',this.connectIDs.localUserID].includes(messageObj.targetUserID)) {
+    console.warn('收到了但是不应该回应！！')
     return;
   }
   if ((this.isInitiator_ && messageObj.type === 'answer') ||
@@ -260,6 +260,10 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 };
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
+  if (['all',this.connectIDs.localUserID].includes(messageObj.targetUserID)) {
+    console.warn('收到了但是不应该回应！！')
+    return;
+  }
   if (message.type === 'offer' && !this.isInitiator_) {
     if (this.pc_.signalingState !== 'stable') {
       trace('ERROR: remote offer received in unexpected state: ' +
