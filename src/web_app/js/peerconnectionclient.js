@@ -55,6 +55,7 @@ var PeerConnectionClient = function (params, startTime) {
   this.isInitiator_ = false;
   this.started_ = false;
   this.connectIDs = null;
+  this.iscaller = false;
   // TODO(jiayl): Replace callbacks with events.
   // Public callbacks. Keep it sorted.
   this.onerror = null;
@@ -283,11 +284,12 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   // 前者用户鉴定>2的广播，后者用于A建立房间时只有自己
   let initflag = false
-  if (!message.targetUserID) {
+  if (!this.connectIDs.targetUserID) {
     initflag = true
   }
   if (!['all', this.connectIDs.localUserID].includes(message.targetUserID) && !initflag) {
     console.warn('收到了但是不应该回应！！')
+    console.log(this.connectIDs.localUserID,message.targetUserID)
     return;
   }
   console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
