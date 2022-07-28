@@ -459,7 +459,7 @@ def save_message_from_client(host, room_id, client_id, message):
     if memcache_client.cas(key, room, constants.ROOM_MEMCACHE_EXPIRATION_SEC):
       logging.info('Saved message for client %s:%s in room %s, retries=%d' \
           %(client_id, str(client), room_id, retries))
-      return {'error': None, 'saved': True}
+      return {'error': None, 'saved': True,'count':room.get_occupancy()}
     retries = retries + 1
 
 class LeavePage(webapp2.RequestHandler):
@@ -495,19 +495,13 @@ class MessagePage(webapp2.RequestHandler):
     message_json = self.request.body
     result = save_message_from_client(
         self.request.host_url, room_id, client_id, message_json)
-    self.send_message_to_collider(room_id, client_id, message_json)
     if result['error'] is not None:
       self.write_response(result['error'])
       return
-    #if not result['saved']:
-      # Other client joined, forward to collider. Do this outside the lock.
-      # Note: this may fail in local dev server due to not having the right
-      # certificate file locally for SSL validation.
-      # Note: loopback scenario follows this code path.
-      # TODO(tkchin): consider async fetch here.
-      
-    #else:
-      #self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
+    if result['count']>2:
+       self.send_message_to_collider(room_id, client_id, message_json)
+    else:
+      self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
 
 class JoinPage(webapp2.RequestHandler):
   def write_response(self, result, params, messages):
@@ -526,6 +520,7 @@ class JoinPage(webapp2.RequestHandler):
     room = memcache_client.gets(key)
     occupancy = room.get_occupancy()
     params['room_user_count'] = occupancy
+    params['room_state'] = str(room)
     self.write_response('SUCCESS', params, messages)
 
   def post(self, room_id):

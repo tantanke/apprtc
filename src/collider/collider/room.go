@@ -89,7 +89,8 @@ func (rm *room) send(srcClientID string, msg string) error {
 		return err
 	}
 	log.Printf("客户端%s进入send消息阶段",srcClientID)
-	// 等于一时暂存消息 等待其他发送
+	// 等于一时暂存消息 等待其他发送 
+	// 其实是不需要的 等于一时不需要走进该循环
 	/* if len(rm.clients) == 1 {
 		log.Printf("客户端%s 暂存消息", srcClientID)
 		return rm.clients[srcClientID].enqueue(msg)
