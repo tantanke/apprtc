@@ -279,7 +279,7 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 };
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
-  if (['all',this.connectIDs.localUserID].includes(message.targetUserID)) {
+  if (!['all',this.connectIDs.localUserID].includes(message.targetUserID)) {
     console.warn('收到了但是不应该回应！！')
     return;
   }
