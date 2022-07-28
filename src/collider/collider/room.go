@@ -7,7 +7,7 @@ package collider
 
 import (
 	"errors"
-	"fmt"
+	/* "fmt" */
 	"io"
 	"log"
 	"net/http"
