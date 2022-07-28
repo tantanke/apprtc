@@ -282,7 +282,11 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   // 前者用户鉴定>2的广播，后者用于A建立房间时只有自己
-  if (!['all', this.connectIDs.localUserID].includes(message.targetUserID)) {
+  let initflag = false
+  if (!message.targetUserID) {
+    initflag = true
+  }
+  if (!['all', this.connectIDs.localUserID].includes(message.targetUserID) && !initflag) {
     console.warn('收到了但是不应该回应！！')
     return;
   }

@@ -265,7 +265,7 @@ Call.prototype.connectToRoom_ = function (roomId) {
       }) : 'all'
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: targetUserID,
+        targetUserID: targetUserID||0,
         allOtherMembers: data.filter(item => {
           return item !== roomParams.client_id
         })
