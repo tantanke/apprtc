@@ -69,11 +69,11 @@ func (rm *room) register(clientID string, rwc io.ReadWriteCloser) error {
 	log.Printf("Client %s registered in room %s", clientID, rm.id)
 	// 注册的时候会分发消息 仅限第二个
 	// Sends the queued messages from the other client of the room.
-	if len(rm.clients) == 2 {
+	/* if len(rm.clients) == 2 {
 		for _, otherClient := range rm.clients {
 			otherClient.sendQueued(c)
 		}
-	}
+	} */
 	/* if len(rm.clients) > 2 {
 		for _, otherClient := range rm.clients {
 			c.sendQueued(otherClient)
@@ -90,10 +90,10 @@ func (rm *room) send(srcClientID string, msg string) error {
 	}
 	log.Printf("客户端%s进入send消息阶段",srcClientID)
 	// 等于一时暂存消息 等待其他发送
-	if len(rm.clients) == 1 {
+	/* if len(rm.clients) == 1 {
 		log.Printf("客户端%s 暂存消息", srcClientID)
 		return rm.clients[srcClientID].enqueue(msg)
-	}
+	} */
 	// Send the message to the other client of the room.
 	for _, oc := range rm.clients {
 		if oc.id != srcClientID {
