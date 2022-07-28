@@ -287,9 +287,9 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   if (!this.connectIDs.targetUserID) {
     initflag = true
   }
-  if (!['all', this.connectIDs.localUserID.replaceAll(' ','')].includes(message.targetUserID.replaceAll(' ','')) && !initflag) {
+  if (!initflag && !['all', this.connectIDs.localUserID.replaceAll(' ', '')].includes(message.targetUserID.replaceAll(' ', ''))) {
     console.warn('收到了但是不应该回应！！')
-    console.log(this.connectIDs.localUserID,message.targetUserID)
+    console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
   }
   console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
