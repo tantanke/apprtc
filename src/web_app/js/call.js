@@ -24,7 +24,6 @@ var Call = function (params) {
   this.channel_.onmessage = this.onRecvSignalingChannelMessage_.bind(this);
 
   this.pcClient_ = null;
-  this.pcClient2_ = null
   this.localStream_ = null;
   this.errorMessageQueue_ = [];
   this.startTime = null;
@@ -261,11 +260,15 @@ Call.prototype.connectToRoom_ = function (roomId) {
       const data = roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
         return item.replace(/'/g, '')
       })
-      const targetUserID = data[data.length - 1]
+      const targetUserID = data.length <= 2 ? data[data.findIndex(item => {
+        item !== roomParams.client_id
+      })] : 'all'
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: roomParams.room_user_count > 2 ? 'all' : targetUserID,
-        allMembers: data
+        targetUserID,
+        allOtherMembers: data.filter(item => {
+          return item !== roomParams.client_id
+        })
       }
     }.bind(this)).catch(function (error) {
       this.onError_('Room server join error: ' + error.message);

@@ -293,8 +293,13 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
         this.pc_.signalingState);
       return;
     }
-    this.setRemoteSdp_(message);
-    this.doAnswer_();
+    if (message.targetUserID === 'all') {
+
+    } else {
+      this.setRemoteSdp_(message);
+      this.doAnswer_();
+    }
+
   } else if (message.type === 'answer' && this.isInitiator_) {
     if (this.pc_.signalingState !== 'have-local-offer') {
       trace('ERROR: remote answer received in unexpected state: ' +
