@@ -24,6 +24,7 @@ var Call = function (params) {
   this.channel_.onmessage = this.onRecvSignalingChannelMessage_.bind(this);
 
   this.pcClient_ = null;
+  this.pcClient2_ = null
   this.localStream_ = null;
   this.errorMessageQueue_ = [];
   this.startTime = null;
