@@ -24,6 +24,7 @@ var Call = function (params) {
   this.channel_.onmessage = this.onRecvSignalingChannelMessage_.bind(this);
 
   this.pcClient_ = null;
+  this.peerConnections = {}
   this.localStream_ = null;
   this.errorMessageQueue_ = [];
   this.startTime = null;
@@ -219,7 +220,6 @@ Call.prototype.maybeCreatePcClientAsync_ = function () {
       resolve();
       return;
     }
-
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
       var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
       RTCPeerConnection.generateCertificate(certParams)
@@ -253,13 +253,47 @@ Call.prototype.createPcClient_ = function () {
   this.pcClient_.onerror = this.onerror;
   trace('Created PeerConnectionClient');
 };
-
+// 初始的1v1的链接连接建立者（AB），采用本来的方式建立连接
+// 当user>3的时候以及新的初始化者采用一次性初始化两个服务端的方式
+// 旧的参与者AB以targetUser：'all' 以及 this.peerConnections[c localUser]为标准建立
+// 确保只有一个本地流 每个新的client被建立时 remove旧的本地流
+Call.prototype.createPcClientThanTwo = function (remoteUserID) {
+  if (this.peerConnections[remoteUserID]) {// 创建才进行创建
+    reslove()
+  }
+  return new Promise(function (resolve, reject) {
+    if (typeof RTCPeerConnection.generateCertificate === 'function') {
+      var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
+      RTCPeerConnection.generateCertificate(certParams)
+        .then(function (cert) {
+          trace('ECDSA certificate generated successfully.');
+          this.params_.peerConnectionConfig.certificates = [cert];
+          this.peerConnections[remoteUserID] = new PeerConnectionClient(this.params_, this.startTime);
+          this.peerConnections[remoteUserID] = this.sendSignalingMessage_.bind(this);
+          this.peerConnections[remoteUserID] = this.onremotehangup;
+          this.peerConnections[remoteUserID] = this.onremotesdpset;
+          this.peerConnections[remoteUserID] = this.onremotestreamadded;
+          this.peerConnections[remoteUserID] = this.onsignalingstatechange;
+          this.peerConnections[remoteUserID] = this.oniceconnectionstatechange;
+          this.peerConnections[remoteUserID] = this.onnewicecandidate;
+          this.peerConnections[remoteUserID] = this.onerror;
+          resolve();
+        }.bind(this))
+        .catch(function (error) {
+          trace('ECDSA certificate generation failed.');
+          reject(error);
+        });
+    } else {
+      this.createPcClient_();
+      resolve();
+    }
+  }.bind(this));
+};
 Call.prototype.startSignaling_ = function () {
   trace('Starting signaling.');
   if (this.isInitiator() && this.oncallerstarted) {
     this.oncallerstarted(this.params_.roomId, this.params_.roomLink);
   }
-
   this.startTime = window.performance.now();
   if (this.params_.room_user_count < 3) {
     // 对RTCPeerConnection的封装
@@ -269,21 +303,28 @@ Call.prototype.startSignaling_ = function () {
           trace('Adding local stream.');
           this.pcClient_.addStream(this.localStream_);
         }
-        if (this.params_.isInitiator ) {
+        if (this.params_.isInitiator) {
           this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
         } else if (!this.params_.isInitiator) {
           this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
-        } 
+        }
       }.bind(this))
       .catch(function (e) {
         this.onError_('Create PeerConnection exception: ' + e);
         alert('Cannot create RTCPeerConnection: ' + e.message);
       }.bind(this));
-  }else{
+  } else {
     console.log(this.params_.allOtherMembers)
-     /*  this.pcClient_.startAsCallerThanThree(this.params_.offerOptions, this.params_.connectIDs); */
+    for (const item of this.params_.allOtherMembers) {
+      createPcClientThanTwo(item).then(function () {
+        console.log(`为${item} 创建peer连接`)
+        this.peerConnections[item].startAsCaller(this.params_.offerOptions, this.params_.connectIDs)
+      }.bind(this)).catch(function (e) {
+        this.onError_('Create PeerConnection exception: ' + e);
+        alert('Cannot create RTCPeerConnection: ' + e.message);
+      }.bind(this));
+    }
   }
-
 };
 Call.prototype.toggleAudioMute = function () {
   var audioTracks = this.localStream_.getAudioTracks();
@@ -503,8 +544,16 @@ Call.prototype.joinRoom_ = function () {
 
 Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
   console.log('call收到消息', msg)
-  this.maybeCreatePcClientAsync_()
-    .then(this.pcClient_.receiveSignalingMessage(msg));
+  const messageObj = JSON.parse(msg)
+  if (this.params_.room_user_count < 3 && messageObj.targetUserID !== 'all') {
+    this.maybeCreatePcClientAsync_()
+      .then(this.pcClient_.receiveSignalingMessage(msg));
+  } else {
+    this.createPcClientThanTwo(messageObj.localUserID).then(
+      this.peerConnection[messageObj.localUserID].receiveSignalingMessage(msg)
+    )
+  }
+
 };
 
 Call.prototype.sendSignalingMessage_ = function (message) {
