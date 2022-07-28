@@ -260,9 +260,10 @@ Call.prototype.connectToRoom_ = function (roomId) {
       const data = roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
         return item.replace(/'/g, '')
       })
+      const targetUserID = data.shift()
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: roomParams.room_user_count > 2 ? 'all' : data.shift(),
+        targetUserID: roomParams.room_user_count > 2 ? 'all' : targetUserID,
         allOtherMembers: data
       }
     }.bind(this)).catch(function (error) {

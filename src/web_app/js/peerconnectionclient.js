@@ -112,7 +112,7 @@ PeerConnectionClient.prototype.startAsCallerThanThree = function (offerOptions, 
     return false;
   }
   this.connectIDs = connectIDs
-  console.log(connectIDs)
+  console.warn(connectIDs)
   this.isInitiator_ = true;
   this.started_ = true;
   var constraints = mergeConstraints(
@@ -156,6 +156,7 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages,connect
 };
 
 PeerConnectionClient.prototype.receiveSignalingMessage = function (message) {
+  console.error('开始处理消息！',messageObj.type)
   var messageObj = parseJSON(message);
   if (!messageObj) {
     return;
