@@ -119,6 +119,7 @@ PeerConnectionClient.prototype.startAsCallerThanThree = function (offerOptions, 
     PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
   trace('Sending offer to peer, with constraints: \n\'' +
     JSON.stringify(constraints) + '\'.');
+    // 不需要等一个创建之后才进行下一个创建
   this.pc_.createOffer(constraints)
     .then(this.setLocalSdpAndNotify_.bind(this))
     .catch(this.onError_.bind(this, 'createOffer'));
@@ -280,7 +281,8 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 };
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
-  if (!['all',this.connectIDs.localUserID].includes(message.targetUserID)) {
+  // 前者用户鉴定>2的广播，后者用于A建立房间时只有自己
+  if (!['all',this.connectIDs.localUserID].includes(message.targetUserID) && message.targetUserID!==message.localUserID) {
     console.warn('收到了但是不应该回应！！')
     return;
   }
