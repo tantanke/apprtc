@@ -260,11 +260,11 @@ Call.prototype.connectToRoom_ = function (roomId) {
       const data = roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
         return item.replace(/'/g, '')
       })
-      const targetUserID = data.shift()
+      const targetUserID = data[data.length - 1]
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
         targetUserID: roomParams.room_user_count > 2 ? 'all' : targetUserID,
-        allOtherMembers: data
+        allMembers: data
       }
     }.bind(this)).catch(function (error) {
       this.onError_('Room server join error: ' + error.message);

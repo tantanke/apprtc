@@ -112,21 +112,20 @@ PeerConnectionClient.prototype.startAsCallerThanThree = function (offerOptions, 
     return false;
   }
   this.connectIDs = connectIDs
-  console.log(connectIDs)
   this.isInitiator_ = true;
   this.started_ = true;
   var constraints = mergeConstraints(
     PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
   trace('Sending offer to peer, with constraints: \n\'' +
     JSON.stringify(constraints) + '\'.');
-    // 不需要等一个创建之后才进行下一个创建
+  // 不需要等一个创建之后才进行下一个创建
   this.pc_.createOffer(constraints)
     .then(this.setLocalSdpAndNotify_.bind(this))
     .catch(this.onError_.bind(this, 'createOffer'));
 
   return true;
 };
-PeerConnectionClient.prototype.startAsCallee = function (initialMessages,connectIDs) {
+PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connectIDs) {
   if (!this.pc_) {
     return false;
   }
@@ -157,7 +156,7 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages,connect
 
 PeerConnectionClient.prototype.receiveSignalingMessage = function (message) {
   var messageObj = parseJSON(message);
-  console.error('开始处理消息！',messageObj.type)
+  console.error('开始处理消息！', messageObj.type)
   if (!messageObj) {
     return;
   }
@@ -283,10 +282,11 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   // 前者用户鉴定>2的广播，后者用于A建立房间时只有自己
-  if (!['all',this.connectIDs.localUserID].includes(message.targetUserID) && message.targetUserID!==message.localUserID) {
+  if (!['all', this.connectIDs.localUserID].includes(message.targetUserID) && message.targetUserID !== message.localUserID) {
     console.warn('收到了但是不应该回应！！')
     return;
   }
+  console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
   if (message.type === 'offer' && !this.isInitiator_) {
     if (this.pc_.signalingState !== 'stable') {
       trace('ERROR: remote offer received in unexpected state: ' +
