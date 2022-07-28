@@ -105,7 +105,7 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
   return true;
 };
 
-PeerConnectionClient.prototype.startAsCallee = function (initialMessages) {
+PeerConnectionClient.prototype.startAsCallee = function (initialMessages,connectIDs) {
   if (!this.pc_) {
     return false;
   }

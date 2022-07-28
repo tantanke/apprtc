@@ -258,9 +258,9 @@ Call.prototype.connectToRoom_ = function (roomId) {
       // 取数组最后一位
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: [...roomParams.room_state.replace(/\[|\]/g,'').split(',').map(item =>{
-          return item.replace(/'/g,'')
-      })].pop()
+        targetUserID: room_user_count > 2 ? 'all' : [...roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
+          return item.replace(/'/g, '')
+        })].pop()
       }
     }.bind(this)).catch(function (error) {
       this.onError_('Room server join error: ' + error.message);
@@ -439,10 +439,10 @@ Call.prototype.startSignaling_ = function () {
         this.pcClient_.addStream(this.localStream_);
       }
       if (this.params_.isInitiator) {
-        this.pcClient_.startAsCaller(this.params_.offerOptions,this.params_.connectIDs);
+        this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
       } else {
         console.log(this.params_.messages, 666666)
-        this.pcClient_.startAsCallee(this.params_.messages,this.params_.connectIDs);
+        this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
       }
     }.bind(this))
     .catch(function (e) {
