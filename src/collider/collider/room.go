@@ -98,7 +98,7 @@ func (rm *room) send(srcClientID string, msg string) error {
 	// Send the message to the other client of the room.
 	if len(rm.clients) >= 3 {
 		for _, oc := range rm.clients {
-			log("%s进入消息分发",srcClientID)
+			log.Printf("%s进入消息分发",srcClientID)
 			if oc.id != srcClientID {
 				log.Printf("客户端%s 向 客户端%s 转发消息：%s", srcClientID,oc.id,msg)
 				src.send(oc, msg)
