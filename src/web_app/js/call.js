@@ -255,12 +255,15 @@ Call.prototype.connectToRoom_ = function (roomId) {
       this.params_.roomLink = roomParams.room_link;
       this.params_.isInitiator = roomParams.is_initiator === 'true';
       this.params_.messages = roomParams.messages;
+      this.params_.room_user_count = roomParams.room_user_count
       // 取数组最后一位
+      const data = roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
+        return item.replace(/'/g, '')
+      })
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: roomParams.room_user_count > 2 ? 'all' : [...roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
-          return item.replace(/'/g, '')
-        })].shift()
+        targetUserID: roomParams.room_user_count > 2 ? 'all' : data.shift(),
+        allOtherMembers: data
       }
     }.bind(this)).catch(function (error) {
       this.onError_('Room server join error: ' + error.message);
@@ -441,7 +444,6 @@ Call.prototype.startSignaling_ = function () {
       if (this.params_.isInitiator && this.params_.room_user_count < 3) {
         this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
       } else if (!this.params_.isInitiator) {
-        console.log(this.params_.messages, 666666)
         this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
       } else if (this.params_.isInitiator && this.params_.room_user_count >= 3) {
         this.pcClient_.startAsCallerThanThree(this.params_.offerOptions, this.params_.connectIDs);

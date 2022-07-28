@@ -112,6 +112,7 @@ PeerConnectionClient.prototype.startAsCallerThanThree = function (offerOptions, 
     return false;
   }
   this.connectIDs = connectIDs
+  console.log(connectIDs)
   this.isInitiator_ = true;
   this.started_ = true;
   var constraints = mergeConstraints(
