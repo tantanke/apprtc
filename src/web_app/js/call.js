@@ -258,7 +258,7 @@ Call.prototype.connectToRoom_ = function (roomId) {
       // 取数组最后一位
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: this.params_.room_user_count > 2 ? 'all' : [...roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
+        targetUserID: roomParams.room_user_count > 2 ? 'all' : [...roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
           return item.replace(/'/g, '')
         })].shift()
       }
