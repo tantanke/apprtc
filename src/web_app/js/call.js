@@ -438,11 +438,13 @@ Call.prototype.startSignaling_ = function () {
         trace('Adding local stream.');
         this.pcClient_.addStream(this.localStream_);
       }
-      if (this.params_.isInitiator) {
+      if (this.params_.isInitiator && this.params_.room_user_count < 3) {
         this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
-      } else {
+      } else if (!this.params_.isInitiator) {
         console.log(this.params_.messages, 666666)
         this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
+      } else if (this.params_.isInitiator && this.params_.room_user_count >= 3) {
+        this.pcClient_.startAsCallerThanThree(this.params_.offerOptions, this.params_.connectIDs);
       }
     }.bind(this))
     .catch(function (e) {

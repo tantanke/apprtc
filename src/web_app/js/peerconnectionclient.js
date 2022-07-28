@@ -103,7 +103,27 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
 
   return true;
 };
+PeerConnectionClient.prototype.startAsCallerThanThree = function (offerOptions, connectIDs) {
+  if (!this.pc_) {
+    return false;
+  }
 
+  if (this.started_) {
+    return false;
+  }
+  this.connectIDs = connectIDs
+  this.isInitiator_ = true;
+  this.started_ = true;
+  var constraints = mergeConstraints(
+    PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
+  trace('Sending offer to peer, with constraints: \n\'' +
+    JSON.stringify(constraints) + '\'.');
+  this.pc_.createOffer(constraints)
+    .then(this.setLocalSdpAndNotify_.bind(this))
+    .catch(this.onError_.bind(this, 'createOffer'));
+
+  return true;
+};
 PeerConnectionClient.prototype.startAsCallee = function (initialMessages,connectIDs) {
   if (!this.pc_) {
     return false;
@@ -135,8 +155,7 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages,connect
 
 PeerConnectionClient.prototype.receiveSignalingMessage = function (message) {
   var messageObj = parseJSON(message);
-  if (!messageObj || ['all',this.connectIDs.localUserID].includes(messageObj.targetUserID)) {
-    console.warn('收到了但是不应该回应！！')
+  if (!messageObj) {
     return;
   }
   if ((this.isInitiator_ && messageObj.type === 'answer') ||
