@@ -278,7 +278,7 @@ AppController.prototype.onRemoteStreamAdded_ = function(stream) {
   this.deactivate_(this.sharingDiv_);
   this.displayTurnStatus_('');
   trace('Remote stream added.');
-  console.warn('RemoteStream成功添加！')
+  console.warn('RemoteStream成功添加！',stream)
   this.remoteVideo_.srcObject = stream;
   this.infoBox_.getRemoteTrackIds(stream);
 

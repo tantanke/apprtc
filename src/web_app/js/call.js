@@ -213,7 +213,78 @@ Call.prototype.toggleVideoMute = function () {
   }
   trace('Video ' + (videoTracks[0].enabled ? 'unmuted.' : 'muted.'));
 };
+Call.prototype.maybeCreatePcClientAsync_ = function () {
+  return new Promise(function (resolve, reject) {
+    if (this.pcClient_) {
+      resolve();
+      return;
+    }
 
+    if (typeof RTCPeerConnection.generateCertificate === 'function') {
+      var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
+      RTCPeerConnection.generateCertificate(certParams)
+        .then(function (cert) {
+          trace('ECDSA certificate generated successfully.');
+          this.params_.peerConnectionConfig.certificates = [cert];
+          this.createPcClient_();
+          resolve();
+        }.bind(this))
+        .catch(function (error) {
+          trace('ECDSA certificate generation failed.');
+          reject(error);
+        });
+    } else {
+      this.createPcClient_();
+      resolve();
+    }
+  }.bind(this));
+};
+
+Call.prototype.createPcClient_ = function () {
+  console.log('创建客户端信息', this.params_)
+  this.pcClient_ = new PeerConnectionClient(this.params_, this.startTime);
+  this.pcClient_.onsignalingmessage = this.sendSignalingMessage_.bind(this);
+  this.pcClient_.onremotehangup = this.onremotehangup;
+  this.pcClient_.onremotesdpset = this.onremotesdpset;
+  this.pcClient_.onremotestreamadded = this.onremotestreamadded;
+  this.pcClient_.onsignalingstatechange = this.onsignalingstatechange;
+  this.pcClient_.oniceconnectionstatechange = this.oniceconnectionstatechange;
+  this.pcClient_.onnewicecandidate = this.onnewicecandidate;
+  this.pcClient_.onerror = this.onerror;
+  trace('Created PeerConnectionClient');
+};
+
+Call.prototype.startSignaling_ = function () {
+  trace('Starting signaling.');
+  if (this.isInitiator() && this.oncallerstarted) {
+    this.oncallerstarted(this.params_.roomId, this.params_.roomLink);
+  }
+
+  this.startTime = window.performance.now();
+  if (this.params_.room_user_count < 3) {
+    // 对RTCPeerConnection的封装
+    this.maybeCreatePcClientAsync_()
+      .then(function () {
+        if (this.localStream_) {
+          trace('Adding local stream.');
+          this.pcClient_.addStream(this.localStream_);
+        }
+        if (this.params_.isInitiator ) {
+          this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
+        } else if (!this.params_.isInitiator) {
+          this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
+        } 
+      }.bind(this))
+      .catch(function (e) {
+        this.onError_('Create PeerConnection exception: ' + e);
+        alert('Cannot create RTCPeerConnection: ' + e.message);
+      }.bind(this));
+  }else{
+    console.log(this.params_.allOtherMembers)
+     /*  this.pcClient_.startAsCallerThanThree(this.params_.offerOptions, this.params_.connectIDs); */
+  }
+
+};
 Call.prototype.toggleAudioMute = function () {
   var audioTracks = this.localStream_.getAudioTracks();
   if (audioTracks.length === 0) {
@@ -265,7 +336,7 @@ Call.prototype.connectToRoom_ = function (roomId) {
       }) : 'all'
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: targetUserID||0,
+        targetUserID: targetUserID || 0,
         allOtherMembers: data.filter(item => {
           return item !== roomParams.client_id
         })
@@ -392,73 +463,7 @@ Call.prototype.onUserMediaError_ = function (error) {
   alert(errorMessage);
 };
 
-Call.prototype.maybeCreatePcClientAsync_ = function () {
-  return new Promise(function (resolve, reject) {
-    if (this.pcClient_) {
-      resolve();
-      return;
-    }
 
-    if (typeof RTCPeerConnection.generateCertificate === 'function') {
-      var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
-      RTCPeerConnection.generateCertificate(certParams)
-        .then(function (cert) {
-          trace('ECDSA certificate generated successfully.');
-          this.params_.peerConnectionConfig.certificates = [cert];
-          this.createPcClient_();
-          resolve();
-        }.bind(this))
-        .catch(function (error) {
-          trace('ECDSA certificate generation failed.');
-          reject(error);
-        });
-    } else {
-      this.createPcClient_();
-      resolve();
-    }
-  }.bind(this));
-};
-
-Call.prototype.createPcClient_ = function () {
-  this.pcClient_ = new PeerConnectionClient(this.params_, this.startTime);
-  this.pcClient_.onsignalingmessage = this.sendSignalingMessage_.bind(this);
-  this.pcClient_.onremotehangup = this.onremotehangup;
-  this.pcClient_.onremotesdpset = this.onremotesdpset;
-  this.pcClient_.onremotestreamadded = this.onremotestreamadded;
-  this.pcClient_.onsignalingstatechange = this.onsignalingstatechange;
-  this.pcClient_.oniceconnectionstatechange = this.oniceconnectionstatechange;
-  this.pcClient_.onnewicecandidate = this.onnewicecandidate;
-  this.pcClient_.onerror = this.onerror;
-  trace('Created PeerConnectionClient');
-};
-
-Call.prototype.startSignaling_ = function () {
-  trace('Starting signaling.');
-  if (this.isInitiator() && this.oncallerstarted) {
-    this.oncallerstarted(this.params_.roomId, this.params_.roomLink);
-  }
-
-  this.startTime = window.performance.now();
-
-  this.maybeCreatePcClientAsync_()
-    .then(function () {
-      if (this.localStream_) {
-        trace('Adding local stream.');
-        this.pcClient_.addStream(this.localStream_);
-      }
-      if (this.params_.isInitiator && this.params_.room_user_count < 3) {
-        this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
-      } else if (!this.params_.isInitiator) {
-        this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
-      } else if (this.params_.isInitiator && this.params_.room_user_count >= 3) {
-        this.pcClient_.startAsCallerThanThree(this.params_.offerOptions, this.params_.connectIDs);
-      }
-    }.bind(this))
-    .catch(function (e) {
-      this.onError_('Create PeerConnection exception: ' + e);
-      alert('Cannot create RTCPeerConnection: ' + e.message);
-    }.bind(this));
-};
 
 // Join the room and returns room parameters.
 Call.prototype.joinRoom_ = function () {
@@ -497,6 +502,7 @@ Call.prototype.joinRoom_ = function () {
 };
 
 Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
+  console.log('call收到消息', msg)
   this.maybeCreatePcClientAsync_()
     .then(this.pcClient_.receiveSignalingMessage(msg));
 };

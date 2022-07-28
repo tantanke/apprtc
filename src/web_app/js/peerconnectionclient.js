@@ -55,7 +55,7 @@ var PeerConnectionClient = function (params, startTime) {
   this.isInitiator_ = false;
   this.started_ = false;
   this.connectIDs = null;
-  this.iscaller = false;
+  this.firstSet = true;
   // TODO(jiayl): Replace callbacks with events.
   // Public callbacks. Keep it sorted.
   this.onerror = null;
@@ -94,6 +94,7 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
   this.connectIDs = connectIDs
   this.isInitiator_ = true;
   this.started_ = true;
+  this.firstSet = false;
   var constraints = mergeConstraints(
     PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
   trace('Sending offer to peer, with constraints: \n\'' +
@@ -115,6 +116,7 @@ PeerConnectionClient.prototype.startAsCallerThanThree = function (offerOptions, 
   this.connectIDs = connectIDs
   this.isInitiator_ = true;
   this.started_ = true;
+  this.firstSet = false;
   var constraints = mergeConstraints(
     PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
   trace('Sending offer to peer, with constraints: \n\'' +
@@ -138,6 +140,7 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   this.isInitiator_ = false;
   this.started_ = true;
   this.connectIDs = connectIDs
+  this.firstSet = false
   if (initialMessages && initialMessages.length > 0) {
     // Convert received messages to JSON objects and add them to the message
     // queue.
