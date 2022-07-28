@@ -498,7 +498,7 @@ class MessagePage(webapp2.RequestHandler):
     if result['error'] is not None:
       self.write_response(result['error'])
       return
-    if result['count']>2:
+    if result['count']>1:
        self.send_message_to_collider(room_id, client_id, message_json)
     else:
       self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
@@ -567,7 +567,7 @@ class RoomPage(webapp2.RequestHandler):
         get_memcache_key_for_room(maybe_use_https_host_url(self.request), room_id))
     if room is not None:
       logging.info('Room ' + room_id + ' has state ' + str(room))
-      if room.get_occupancy() >= 2:
+      if room.get_occupancy() >= 3:
         logging.info('Room ' + room_id + ' is full')
         self.write_response('full_template.html')
         return
