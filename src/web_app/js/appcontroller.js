@@ -281,7 +281,12 @@ AppController.prototype.onRemoteStreamAdded_ = function(stream) {
   console.warn('RemoteStream成功添加！',stream)
   this.remoteVideo_.srcObject = stream;
   this.infoBox_.getRemoteTrackIds(stream);
-
+  /* var video = document.createElement('video');
+  video.srcObject = stream;
+  video.autoplay = true;
+  video.muted = true;
+  video.playsinline = true;
+  document.querySelector('.remote-videos').appendChild(video); */
 
   if (this.remoteVideoResetTimer_) {
     clearTimeout(this.remoteVideoResetTimer_);

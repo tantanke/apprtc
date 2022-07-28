@@ -316,7 +316,7 @@ Call.prototype.startSignaling_ = function () {
   } else {
     console.log(this.params_.connectIDs.allOtherMembers)
     for (const item of this.params_.connectIDs.allOtherMembers) {
-      createPcClientThanTwo(item).then(function () {
+      this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
         this.peerConnections[item].startAsCaller(this.params_.offerOptions, this.params_.connectIDs)
       }.bind(this)).catch(function (e) {
@@ -370,8 +370,9 @@ Call.prototype.connectToRoom_ = function (roomId) {
       this.params_.room_user_count = roomParams.room_user_count
       // 取数组最后一位
       const data = roomParams.room_state.replace(/\[|\]/g, '').split(',').map(item => {
-        return item.replace(/'/g, '')
+        return item.replace(/'/g, '').replaceAll(' ', '')
       })
+
       const targetUserID = data.length <= 2 ? data.find(item => {
         return item !== roomParams.client_id
       }) : 'all'
