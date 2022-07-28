@@ -83,7 +83,7 @@ func (rm *room) register(clientID string, rwc io.ReadWriteCloser) error {
 }
 
 // send sends the message to the other client of the room, or queues the message if the other client has not joined.
-func (rm *room) send(srcClientID string, msg string) error {
+func (rm *room) send(srcClientID string, msg string) bool {
 	src, err := rm.client(srcClientID)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (rm *room) send(srcClientID string, msg string) error {
 			}
 		}
 	
-
+	return true
 	// The room must be corrupted.
 	/* return errors.New(fmt.Sprintf("Corrupted room %+v", rm)) */
 }
