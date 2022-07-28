@@ -96,7 +96,6 @@ func (rm *room) send(srcClientID string, msg string) error {
 		return rm.clients[srcClientID].enqueue(msg)
 	} */
 	// Send the message to the other client of the room.
-	if len(rm.clients) >= 3 {
 		for _, oc := range rm.clients {
 			log.Printf("%s进入消息分发",srcClientID)
 			if oc.id != srcClientID {
@@ -104,7 +103,6 @@ func (rm *room) send(srcClientID string, msg string) error {
 				src.send(oc, msg)
 			}
 		}
-	}
 	
 
 	// The room must be corrupted.
