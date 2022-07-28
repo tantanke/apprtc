@@ -258,7 +258,7 @@ Call.prototype.connectToRoom_ = function (roomId) {
       // 取数组最后一位
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID: [...JSON.parse(roomParams.room_state)].pop()
+        targetUserID: [...JSON.parse(roomParams.room_state.split(','))].pop()
       }
     }.bind(this)).catch(function (error) {
       this.onError_('Room server join error: ' + error.message);

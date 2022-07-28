@@ -520,7 +520,7 @@ class JoinPage(webapp2.RequestHandler):
     room = memcache_client.gets(key)
     occupancy = room.get_occupancy()
     params['room_user_count'] = occupancy
-    params['room_state'] = room
+    params['room_state'] = ','.join(room)
     self.write_response('SUCCESS', params, messages)
 
   def post(self, room_id):
