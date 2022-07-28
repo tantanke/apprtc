@@ -258,7 +258,9 @@ Call.prototype.connectToRoom_ = function (roomId) {
       // 取数组最后一位
       this.params_.connectIDs = {
         localUserID: roomParams.client_id,
-        targetUserID:''
+        targetUserID: [...roomParams.room_state.replace(/\[|\]/g,'').split(',').map(item =>{
+          return item.replace(/'/g,'')
+      })].pop()
       }
     }.bind(this)).catch(function (error) {
       this.onError_('Room server join error: ' + error.message);
