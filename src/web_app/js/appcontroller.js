@@ -139,7 +139,7 @@ var AppController = function(loadingParams) {
 AppController.prototype.createCall_ = function() {
   var privacyLinks = $(UI_CONSTANTS.privacyLinks);
   this.hide_(privacyLinks);
-  console.log(this.loadingParams)
+  console.log(this.loadingParams_)
   this.call_ = new Call(this.loadingParams_);
   this.infoBox_ = new InfoBox($(UI_CONSTANTS.infoDiv), this.call_,
       this.loadingParams_.versionInfo);
