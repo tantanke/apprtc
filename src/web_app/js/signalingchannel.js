@@ -139,7 +139,7 @@ SignalingChannel.prototype.send = function(message) {
     trace('ERROR: SignalingChannel has not registered.');
     return;
   }
-  trace('C->WSS: ' + message);
+  /* trace('C->WSS: ' + message); */
   console.error('发送消息！',message.type)
   var wssMessage = {
     cmd: 'send',

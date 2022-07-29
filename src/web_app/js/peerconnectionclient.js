@@ -267,6 +267,7 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   // so we can know if the peer has any remote video streams that we need
   // to wait for. Otherwise, transition immediately to the active state.
   var remoteStreams = this.pc_.getRemoteStreams();
+  console.log(remoteStreams)
   if (this.onremotesdpset) {
     this.onremotesdpset(remoteStreams.length > 0 &&
       remoteStreams[0].getVideoTracks().length > 0);
