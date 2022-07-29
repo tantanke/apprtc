@@ -260,7 +260,7 @@ Call.prototype.createPcClient_ = function () {
 Call.prototype.createPcClientThanTwo = function (remoteUserID) {
   return new Promise(function (resolve, reject) {
     if (this.peerConnections[remoteUserID]) {// 创建才进行创建
-      reslove()
+      resolve()
     }
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
       var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
@@ -551,7 +551,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
   if (this.params_.room_user_count < 3 && messageObj.targetUserID !== 'all') {
     this.maybeCreatePcClientAsync_()
       .then(this.pcClient_.receiveSignalingMessage(msg));
-  } else {
+  } else if(messageObj.targetUserID === 'all') {
     this.createPcClientThanTwo(messageObj.localUserID).then(
       this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg)
     )
