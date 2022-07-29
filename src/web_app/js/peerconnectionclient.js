@@ -50,7 +50,6 @@ var PeerConnectionClient = function (params, startTime) {
       sessionId: this.params_.roomId
     }
   }));
-  this.inInitCallee = false;
   this.hasRemoteSdp_ = false;
   this.messageQueue_ = [];
   this.isInitiator_ = false;
@@ -108,14 +107,13 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
 
   return true;
 };
-PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connectIDs, inInitCallee) {
+PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connectIDs) {
   if (!this.pc_) {
     return false;
   }
   if (this.started_) {
     return false;
   }
-  this.inInitCallee = inInitCallee
   this.isInitiator_ = false;
   this.started_ = true;
   this.connectIDs = connectIDs
@@ -145,6 +143,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     console.log('已经建立的连接不再处理消息！')
     return
   }
+  // tag表示直接被新建用于响应
   if (tag && !this.started_) {
     this.started_ = true;
     this.connectIDs = connectIDs

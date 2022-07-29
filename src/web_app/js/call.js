@@ -305,7 +305,7 @@ Call.prototype.startSignaling_ = function () {
         if (this.params_.isInitiator) {
           this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
         } else if (!this.params_.isInitiator) {
-          this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs, true);
+          this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
         }
       }.bind(this))
       .catch(function (e) {
@@ -563,7 +563,10 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建  
       this.createPcClientThanTwo(messageObj.localUserID).then(
         function () {
-          _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, _this.params_.connectIDs)
+          _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
+            targetUserID: messageObj.localUserID,
+            localUserID: _this.params_.connectIDs.localUserID
+          })
         }
       )
     }
@@ -572,7 +575,10 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
     console.log(`${messageObj.localUserID}状态：${_this.peerConnections[messageObj.localUserID]}`)
     this.createPcClientThanTwo(messageObj.localUserID).then(
       function () {
-        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, _this.params_.connectIDs)
+        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
+          targetUserID: messageObj.localUserID,
+          localUserID: _this.params_.connectIDs.localUserID
+        })
       }
     )
   }
