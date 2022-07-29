@@ -164,12 +164,14 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message) {
   if (!messageObj) {
     return;
   }
-  if ((this.isInitiator_ && messageObj.type === 'answer') ||
-    (!this.isInitiator_ && messageObj.type === 'offer')) {
+  if ((messageObj.type === 'answer') ||
+    (messageObj.type === 'offer')) {
     this.hasRemoteSdp_ = true;
     // Always process offer before candidates.
+    console.log(`压入${messageObj.type}到队列中`)
     this.messageQueue_.unshift(messageObj);
   } else if (messageObj.type === 'candidate') {
+    console.log('处理candidate消息')
     this.messageQueue_.push(messageObj);
   } else if (messageObj.type === 'bye') {
     if (this.onremotehangup) {
@@ -286,7 +288,7 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   // 前者用户鉴定>2的广播，后者用于A建立房间时只有自己
-  if (message.targetUserID &&!['all', this.connectIDs.localUserID.replaceAll(' ', '')].includes(message.targetUserID.replaceAll(' ', ''))) {
+  if (message.targetUserID && !['all', this.connectIDs.localUserID.replaceAll(' ', '')].includes(message.targetUserID.replaceAll(' ', ''))) {
     console.warn('收到了但是不应该回应！！')
     console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
@@ -342,6 +344,7 @@ PeerConnectionClient.prototype.drainMessageQueue_ = function () {
     return;
   }
   for (var i = 0, len = this.messageQueue_.length; i < len; i++) {
+    console.log(`正式开始处理to${this.messageQueue_[i].targetUserID}type:${this.messageQueue_[i].type}`)
     this.processSignalingMessage_(this.messageQueue_[i]);
   }
   this.messageQueue_ = [];

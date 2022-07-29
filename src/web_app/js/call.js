@@ -546,14 +546,13 @@ Call.prototype.joinRoom_ = function () {
 };
 
 Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
-  console.log('call收到消息', msg)
   const messageObj = JSON.parse(msg)
+  console.log(`call收到${messageObj.localUserID}的${messageObj.type}消息`)
   const _this = this
   if (this.params_.room_user_count < 3 && messageObj.targetUserID !== 'all') {
     this.maybeCreatePcClientAsync_()
       .then(this.pcClient_.receiveSignalingMessage(msg));
   } else if (messageObj.targetUserID === 'all') {
-    console.log(_this.peerConnections, messageObj.localUserID)
     this.createPcClientThanTwo(messageObj.localUserID).then(
       function () {
         _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg)
