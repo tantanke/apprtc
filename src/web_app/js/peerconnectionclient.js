@@ -84,7 +84,7 @@ PeerConnectionClient.prototype.addStream = function (stream) {
   this.pc_.addStream(stream);
 };
 
-PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectIDs, config={}) {
+PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectIDs, config = {}) {
   if (!this.pc_) {
     return false;
   }
@@ -145,6 +145,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
   if (!messageObj) {
     return;
   }
+
   if (tag && !this.started_) {
     this.started_ = true;
     this.connectIDs = connectIDs
@@ -279,12 +280,17 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
   }
-  if (this.sendMoreTarget && this.sendMoreTarget !== message.localUserID.replaceAll(' ', '')){
+  if (this.sendMoreTarget && this.sendMoreTarget !== message.localUserID.replaceAll(' ', '')) {
     console.warn('收到了但是不应该回应！！')
     console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
   }
-    console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
+  if (this.targetUserIDMore && message.targetUserID) {
+    console.warn('收到了但是不应该回应！！')
+    console.log(this.connectIDs.localUserID, message.targetUserID)
+    return;
+  }
+  console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
   if (message.type === 'offer') {
     if (this.pc_.signalingState !== 'stable') {
       trace('ERROR: remote offer received in unexpected state: ' +
