@@ -303,7 +303,7 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     this.setRemoteSdp_(message);
     this.doAnswer_();
 
-  } else if (message.type === 'answer' && this.isInitiator_) {
+  } else if (message.type === 'answer') {
     if (this.pc_.signalingState !== 'have-local-offer') {
       trace('ERROR: remote answer received in unexpected state: ' +
         this.pc_.signalingState);
