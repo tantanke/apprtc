@@ -556,7 +556,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
     return;
   }
   if (this.params_.room_user_count < 3) {
-    if (this.pcClient_ && this.pcClient_?.isSeted) {
+    if ((this.pcClient_ && !this.pcClient_?.isSeted) || !this.pcClient_) {
       this.maybeCreatePcClientAsync_(messageObj.localUserID)
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
