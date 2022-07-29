@@ -39,6 +39,7 @@ var PeerConnectionClient = function (params, startTime) {
   this.pc_.ontrack = this.onRemoteStreamAdded_.bind(this);
   this.pc_.onremovestream = trace.bind(null, 'Remote stream removed.');
   this.pc_.onsignalingstatechange = this.onSignalingStateChanged_.bind(this);
+  this.isSeted = false;
   this.pc_.oniceconnectionstatechange =
     this.onIceConnectionStateChanged_.bind(this);
   window.dispatchEvent(new CustomEvent('pccreated', {
@@ -146,7 +147,9 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
   if (!messageObj) {
     return;
   }
-
+  if(this.isSeted){
+    return
+  }
   if (tag && !this.started_) {
     this.started_ = true;
     this.connectIDs = connectIDs
@@ -270,6 +273,7 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   // so we can know if the peer has any remote video streams that we need
   // to wait for. Otherwise, transition immediately to the active state.
   var remoteStreams = this.pc_.getRemoteStreams();
+  this.isSeted = true
   console.log('远程流来了', remoteStreams,)
   if (this.onremotesdpset) {
     this.onremotesdpset(remoteStreams.length > 0 &&

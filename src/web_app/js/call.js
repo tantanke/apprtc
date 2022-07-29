@@ -22,7 +22,6 @@ var Call = function (params) {
 
   this.channel_ = new SignalingChannel(params.wssUrl, params.wssPostUrl);
   this.channel_.onmessage = this.onRecvSignalingChannelMessage_.bind(this);
-
   this.pcClient_ = null;
   this.peerConnections = {}
   this.localStream_ = null;
