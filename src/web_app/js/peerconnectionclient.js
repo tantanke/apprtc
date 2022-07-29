@@ -50,14 +50,12 @@ var PeerConnectionClient = function (params, startTime) {
       sessionId: this.params_.roomId
     }
   }));
-  this.targetUserIDMore = '';// 接受到all消息时指定targetID 接受时限定
   this.inInitCallee = false;
   this.hasRemoteSdp_ = false;
   this.messageQueue_ = [];
   this.isInitiator_ = false;
   this.started_ = false;
   this.connectIDs = null;
-  this.sendMoreTarget = '';// 接受到all消息时指定targetID 发送时限定
   this.firstSet = true;
   // TODO(jiayl): Replace callbacks with events.
   // Public callbacks. Keep it sorted.
@@ -94,11 +92,10 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
   if (this.started_) {
     return false;
   }
-  if (config?.more) {
-    this.sendMoreTarget = config.targetUserID
-  }
   this.connectIDs = connectIDs
-  this.isInitiator_ = true;
+  if(config?.more){
+    this.connectIDs.targetUserID = config.targetUserID
+  }
   this.started_ = true;
   this.firstSet = false;
   var constraints = mergeConstraints(
@@ -115,7 +112,6 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   if (!this.pc_) {
     return false;
   }
-
   if (this.started_) {
     return false;
   }
@@ -132,7 +128,6 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
     }
     return true;
   }
-
   // We may have queued messages received from the signaling channel before
   // started.
   if (this.messageQueue_.length > 0) {
@@ -146,7 +141,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
   if (!messageObj) {
     return;
   }
-  if(this.isSeted){
+  if (this.isSeted) {
     console.log('已经建立的连接不再处理消息！')
     return
   }
@@ -242,13 +237,12 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
       // because it JSON.stringify won't include attributes which are on the
       // object's prototype chain. By creating the message to serialize
       // explicitly we can avoid the issue.
-      const target = this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
-      console.warn(`发送sdp local:${this.connectIDs.localUserID} target:${target}`)
+      console.warn(`X${this.connectIDs.localUserID} target:${this.connectIDs.targetUserID}`)
       this.onsignalingmessage({
         sdp: sessionDescription.sdp,
         type: sessionDescription.type,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: target
+        targetUserID: this.connectIDs.targetUserID
       });
     }
   };
@@ -273,7 +267,9 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   // so we can know if the peer has any remote video streams that we need
   // to wait for. Otherwise, transition immediately to the active state.
   var remoteStreams = this.pc_.getRemoteStreams();
-  this.isSeted = true
+  if (this.remoteStreams.length > 0) {
+    this.isSeted = true
+  }
   console.log('远程流来了', remoteStreams,)
   if (this.onremotesdpset) {
     this.onremotesdpset(remoteStreams.length > 0 &&
@@ -282,21 +278,14 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 };
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
-  // 前者用户鉴定>2的广播，后者用于A建立房间时只有自己
-
-  if (this.sendMoreTarget && this.sendMoreTarget !== message.localUserID.replaceAll(' ', '')) {
-    console.warn('收到了但是不应该回应！！')
-    console.warn('不在发送名单中 拒绝回应')
-    return;
+  // 保持第一个创建房间的用户符合统一流程
+  if (!this.connectIDs.targetUserID) {
+    this.connectIDs.targetUserID = message.targetUserID
   }
-  if (!this.inInitCallee && !message.targetUserID) {
-    console.warn('不在发送名单中 拒绝回应')
+  // 一对一进行通信
+  if (this.connectIDs.targetUserID !== message.localUserID.replaceAll(' ', '')) {
     console.warn('收到了但是不应该回应！！')
-    return;
-  }
-  if (this.targetUserIDMore && message.targetUserID) {
     console.warn('不在发送名单中 拒绝回应')
-    console.warn('收到了但是不应该回应！！')
     return;
   }
   console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
@@ -306,12 +295,8 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
         this.pc_.signalingState);
       return;
     }
-    if (message.targetUserID === 'all') {
-      this.targetUserIDMore = message.localUserID;
-    }
     this.setRemoteSdp_(message);
     this.doAnswer_();
-
   } else if (message.type === 'answer') {
     if (this.pc_.signalingState !== 'have-local-offer') {
       trace('ERROR: remote answer received in unexpected state: ' +
@@ -359,15 +344,14 @@ PeerConnectionClient.prototype.onIceCandidate_ = function (event) {
   if (event.candidate) {
     // Eat undesired candidates.
     if (this.filterIceCandidate_(event.candidate)) {
-      const target = this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
-      console.warn(`发送icecandidate local:${this.connectIDs.localUserID} target:${target}`)
+      console.warn(`发送icecandidate local:${this.connectIDs.localUserID} target:${this.connectIDs.targetUserID}`)
       var message = {
         type: 'candidate',
         label: event.candidate.sdpMLineIndex,
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: target
+        targetUserID: this.connectIDs.targetUserID
       };
       if (this.onsignalingmessage) {
         this.onsignalingmessage(message);
