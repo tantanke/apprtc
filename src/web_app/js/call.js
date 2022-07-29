@@ -269,14 +269,14 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
           trace('ECDSA certificate generated successfully.');
           this.params_.peerConnectionConfig.certificates = [cert];
           this.peerConnections[remoteUserID] = new PeerConnectionClient(this.params_, this.startTime);
-          this.peerConnections[remoteUserID] = this.sendSignalingMessage_.bind(this);
-          this.peerConnections[remoteUserID] = this.onremotehangup;
-          this.peerConnections[remoteUserID] = this.onremotesdpset;
-          this.peerConnections[remoteUserID] = this.onremotestreamadded;
-          this.peerConnections[remoteUserID] = this.onsignalingstatechange;
-          this.peerConnections[remoteUserID] = this.oniceconnectionstatechange;
-          this.peerConnections[remoteUserID] = this.onnewicecandidate;
-          this.peerConnections[remoteUserID] = this.onerror;
+          this.peerConnections[remoteUserID].onsignalingmessage = this.sendSignalingMessage_.bind(this);
+          this.peerConnections[remoteUserID].onremotehangup = this.onremotehangup;
+          this.peerConnections[remoteUserID].onremotesdpset = this.onremotesdpset;
+          this.peerConnections[remoteUserID].onremotestreamadded = this.onremotestreamadded;
+          this.peerConnections[remoteUserID].onsignalingstatechange = this.onsignalingstatechange;
+          this.peerConnections[remoteUserID].oniceconnectionstatechange = this.oniceconnectionstatechange;
+          this.peerConnections[remoteUserID].onnewicecandidate = this.onnewicecandidate;
+          this.peerConnections[remoteUserID].onerror = this.onerror;
           resolve();
         }.bind(this))
         .catch(function (error) {
