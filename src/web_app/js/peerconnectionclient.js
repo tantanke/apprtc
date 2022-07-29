@@ -55,6 +55,7 @@ var PeerConnectionClient = function (params, startTime) {
   this.isInitiator_ = false;
   this.started_ = false;
   this.connectIDs = null;
+  this.sendMoreTarget = '';
   this.firstSet = true;
   // TODO(jiayl): Replace callbacks with events.
   // Public callbacks. Keep it sorted.
@@ -83,13 +84,16 @@ PeerConnectionClient.prototype.addStream = function (stream) {
   this.pc_.addStream(stream);
 };
 
-PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectIDs) {
+PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectIDs, config) {
   if (!this.pc_) {
     return false;
   }
 
   if (this.started_) {
     return false;
+  }
+  if (config.more) {
+    this.sendMoreTarget = config.targetUserID
   }
   this.connectIDs = connectIDs
   this.isInitiator_ = true;
@@ -99,29 +103,6 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
     PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
   trace('Sending offer to peer, with constraints: \n\'' +
     JSON.stringify(constraints) + '\'.');
-  this.pc_.createOffer(constraints)
-    .then(this.setLocalSdpAndNotify_.bind(this))
-    .catch(this.onError_.bind(this, 'createOffer'));
-
-  return true;
-};
-PeerConnectionClient.prototype.startAsCallerThanThree = function (offerOptions, connectIDs) {
-  if (!this.pc_) {
-    return false;
-  }
-
-  if (this.started_) {
-    return false;
-  }
-  this.connectIDs = connectIDs
-  this.isInitiator_ = true;
-  this.started_ = true;
-  this.firstSet = false;
-  var constraints = mergeConstraints(
-    PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
-  trace('Sending offer to peer, with constraints: \n\'' +
-    JSON.stringify(constraints) + '\'.');
-  // 不需要等一个创建之后才进行下一个创建
   this.pc_.createOffer(constraints)
     .then(this.setLocalSdpAndNotify_.bind(this))
     .catch(this.onError_.bind(this, 'createOffer'));
@@ -158,14 +139,16 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   return true;
 };
 
-PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag = false) {
+PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag = false, connectIDs) {
   var messageObj = parseJSON(message);
   console.error('开始处理消息！', messageObj.type)
   if (!messageObj) {
     return;
   }
-  if (tag) {
-    this.started_ = true
+  if (tag && !this.started_) {
+    this.started_ = true;
+    this.connectIDs = connectIDs
+    this.firstSet = false
   }
   if ((messageObj.type === 'answer') ||
     (messageObj.type === 'offer')) {
@@ -259,7 +242,7 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
         sdp: sessionDescription.sdp,
         type: sessionDescription.type,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: this.targetUserIDMore || this.connectIDs.targetUserID
+        targetUserID: this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
       });
     }
   };
@@ -296,7 +279,12 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
   }
-  console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
+  if (this.sendMoreTarget && this.sendMoreTarget !== message.localUserID.replaceAll(' ', '')){
+    console.warn('收到了但是不应该回应！！')
+    console.log(this.connectIDs.localUserID, message.targetUserID)
+    return;
+  }
+    console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
   if (message.type === 'offer') {
     if (this.pc_.signalingState !== 'stable') {
       trace('ERROR: remote offer received in unexpected state: ' +
@@ -363,7 +351,7 @@ PeerConnectionClient.prototype.onIceCandidate_ = function (event) {
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: this.targetUserIDMore || this.connectIDs.targetUserID
+        targetUserID: this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
       };
       if (this.onsignalingmessage) {
         this.onsignalingmessage(message);

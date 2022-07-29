@@ -320,7 +320,10 @@ Call.prototype.startSignaling_ = function () {
       this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
         console.log(_this.peerConnections, this.peerConnections)
-        _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs)
+        _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs,{
+          more:true,
+          targetUserID:item
+        })
       }.bind(this)).catch(function (e) {
         this.onError_('Create PeerConnection exception: ' + e);
         alert('Cannot create RTCPeerConnection: ' + e.message);
@@ -555,7 +558,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
   } else if (messageObj.targetUserID === 'all') {
     this.createPcClientThanTwo(messageObj.localUserID).then(
       function () {
-        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg,true)
+        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg,true,this.params_.connectIDs)
       }
     )
   }
