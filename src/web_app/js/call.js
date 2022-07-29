@@ -258,10 +258,10 @@ Call.prototype.createPcClient_ = function () {
 // 旧的参与者AB以targetUser：'all' 以及 this.peerConnections[c localUser]为标准建立
 // 确保只有一个本地流 每个新的client被建立时 remove旧的本地流
 Call.prototype.createPcClientThanTwo = function (remoteUserID) {
-  if (this.peerConnections[remoteUserID]) {// 创建才进行创建
-    reslove()
-  }
   return new Promise(function (resolve, reject) {
+    if (this.peerConnections[remoteUserID]) {// 创建才进行创建
+      reslove()
+    }
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
       var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
       RTCPeerConnection.generateCertificate(certParams)
@@ -551,7 +551,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
       .then(this.pcClient_.receiveSignalingMessage(msg));
   } else {
     this.createPcClientThanTwo(messageObj.localUserID).then(
-      this.peerConnection[messageObj.localUserID].receiveSignalingMessage(msg)
+      this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg)
     )
   }
 
