@@ -49,7 +49,7 @@ var PeerConnectionClient = function (params, startTime) {
       sessionId: this.params_.roomId
     }
   }));
-
+  this.targetUserIDMore = ''
   this.hasRemoteSdp_ = false;
   this.messageQueue_ = [];
   this.isInitiator_ = false;
@@ -158,11 +158,14 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   return true;
 };
 
-PeerConnectionClient.prototype.receiveSignalingMessage = function (message) {
+PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag = false) {
   var messageObj = parseJSON(message);
   console.error('开始处理消息！', messageObj.type)
   if (!messageObj) {
     return;
+  }
+  if (tag) {
+    this.started_ = true
   }
   if ((messageObj.type === 'answer') ||
     (messageObj.type === 'offer')) {
@@ -256,7 +259,7 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
         sdp: sessionDescription.sdp,
         type: sessionDescription.type,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: this.connectIDs.targetUserID
+        targetUserID: this.targetUserIDMore || this.connectIDs.targetUserID
       });
     }
   };
@@ -294,18 +297,17 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     return;
   }
   console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
-  if (message.type === 'offer' && !this.isInitiator_) {
+  if (message.type === 'offer') {
     if (this.pc_.signalingState !== 'stable') {
       trace('ERROR: remote offer received in unexpected state: ' +
         this.pc_.signalingState);
       return;
     }
     if (message.targetUserID === 'all') {
-
-    } else {
-      this.setRemoteSdp_(message);
-      this.doAnswer_();
+      this.targetUserIDMore = message.localUserID;
     }
+    this.setRemoteSdp_(message);
+    this.doAnswer_();
 
   } else if (message.type === 'answer' && this.isInitiator_) {
     if (this.pc_.signalingState !== 'have-local-offer') {
@@ -361,7 +363,7 @@ PeerConnectionClient.prototype.onIceCandidate_ = function (event) {
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: this.connectIDs.targetUserID
+        targetUserID: this.targetUserIDMore || this.connectIDs.targetUserID
       };
       if (this.onsignalingmessage) {
         this.onsignalingmessage(message);

@@ -555,7 +555,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
   } else if (messageObj.targetUserID === 'all') {
     this.createPcClientThanTwo(messageObj.localUserID).then(
       function () {
-        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg)
+        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg,true)
       }
     )
   }
