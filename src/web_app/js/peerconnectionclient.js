@@ -240,7 +240,7 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
       // object's prototype chain. By creating the message to serialize
       // explicitly we can avoid the issue.
       const target = this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
-      console.warn(`发送icecandidate local:${this.connectIDs.localUserID} target:${target}`)
+      console.warn(`发送sdp local:${this.connectIDs.localUserID} target:${target}`)
       this.onsignalingmessage({
         sdp: sessionDescription.sdp,
         type: sessionDescription.type,
