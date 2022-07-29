@@ -84,7 +84,7 @@ PeerConnectionClient.prototype.addStream = function (stream) {
   this.pc_.addStream(stream);
 };
 
-PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectIDs, config) {
+PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectIDs, config={}) {
   if (!this.pc_) {
     return false;
   }
@@ -92,7 +92,7 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
   if (this.started_) {
     return false;
   }
-  if (config.more) {
+  if (config?.more) {
     this.sendMoreTarget = config.targetUserID
   }
   this.connectIDs = connectIDs
