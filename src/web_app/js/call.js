@@ -305,7 +305,7 @@ Call.prototype.startSignaling_ = function () {
         if (this.params_.isInitiator) {
           this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
         } else if (!this.params_.isInitiator) {
-          this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs,true);
+          this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs, true);
         }
       }.bind(this))
       .catch(function (e) {
@@ -319,9 +319,9 @@ Call.prototype.startSignaling_ = function () {
       this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
         console.log(_this.peerConnections, this.peerConnections)
-        _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs,{
-          more:true,
-          targetUserID:item
+        _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs, {
+          more: true,
+          targetUserID: item
         })
       }.bind(this)).catch(function (e) {
         this.onError_('Create PeerConnection exception: ' + e);
@@ -549,15 +549,30 @@ Call.prototype.joinRoom_ = function () {
 
 Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
   const messageObj = JSON.parse(msg)
-  console.log(`call收到${messageObj.localUserID}的${messageObj.type}消息`)
+  console.log(`${_this.params_.connectIDs} 收到 ${messageObj.localUserID}的发给${messageObj.targetUserID}的${messageObj.type}消息`)
   const _this = this
-  if (this.params_.room_user_count < 3 && messageObj.targetUserID !== 'all') {
-    this.maybeCreatePcClientAsync_()
-      .then(this.pcClient_.receiveSignalingMessage(msg));
-  } else if (messageObj.targetUserID === 'all' || this.params_.room_user_count>=3) {
+  if (messageObj.targetUserID && !['all', _this.params_.connectIDs.replaceAll(' ', '')].includes(messageObj.targetUserID.replaceAll(' ', ''))) {
+    console.warn('不在发送名单中 拒绝回应')
+    return;
+  }
+  if (this.params_.room_user_count < 3) {
+    if (this.pcClient_ && this.pcClient_?.isSeted) {
+      this.maybeCreatePcClientAsync_(messageObj.localUserID)
+        .then(this.pcClient_.receiveSignalingMessage(msg));
+    } else {
+      //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建  
+      this.createPcClientThanTwo(messageObj.localUserID).then(
+        function () {
+          _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, _this.params_.connectIDs)
+        }
+      )
+    }
+
+  } else if (this.params_.room_user_count >= 3) { // count>=3时需要该循环
+    console.log(`${messageObj.localUserID}状态：${_this.peerConnections[messageObj.localUserID]}`)
     this.createPcClientThanTwo(messageObj.localUserID).then(
       function () {
-        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg,true,_this.params_.connectIDs)
+        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, _this.params_.connectIDs)
       }
     )
   }
@@ -576,7 +591,7 @@ Call.prototype.sendSignalingMessage_ = function (message) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', path, true);
     xhr.send(msgString);
-    trace('C->GAE: '+this.params_.clientId);
+    trace('C->GAE: ' + this.params_.clientId);
   } else {
     this.channel_.send(msgString);
   }

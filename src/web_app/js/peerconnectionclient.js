@@ -143,11 +143,11 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
 
 PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag = false, connectIDs) {
   var messageObj = parseJSON(message);
-  console.error('开始处理消息！', messageObj.type)
   if (!messageObj) {
     return;
   }
   if(this.isSeted){
+    console.log('已经建立的连接不再处理消息！')
     return
   }
   if (tag && !this.started_) {
@@ -162,7 +162,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     console.log(`压入${messageObj.type}到队列中`)
     this.messageQueue_.unshift(messageObj);
   } else if (messageObj.type === 'candidate') {
-    console.log('处理candidate消息')
+    console.log('压入candidate消息到队列中')
     this.messageQueue_.push(messageObj);
   } else if (messageObj.type === 'bye') {
     if (this.onremotehangup) {
@@ -283,24 +283,20 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   // 前者用户鉴定>2的广播，后者用于A建立房间时只有自己
-  if (message.targetUserID && !['all', this.connectIDs.localUserID.replaceAll(' ', '')].includes(message.targetUserID.replaceAll(' ', ''))) {
-    console.warn('收到了但是不应该回应！！')
-    console.log(this.connectIDs.localUserID, message.targetUserID)
-    return;
-  }
+
   if (this.sendMoreTarget && this.sendMoreTarget !== message.localUserID.replaceAll(' ', '')) {
     console.warn('收到了但是不应该回应！！')
-    console.log(this.connectIDs.localUserID, message.targetUserID)
+    console.warn('不在发送名单中 拒绝回应')
     return;
   }
   if (!this.inInitCallee && !message.targetUserID) {
+    console.warn('不在发送名单中 拒绝回应')
     console.warn('收到了但是不应该回应！！')
-    console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
   }
   if (this.targetUserIDMore && message.targetUserID) {
+    console.warn('不在发送名单中 拒绝回应')
     console.warn('收到了但是不应该回应！！')
-    console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
   }
   console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
