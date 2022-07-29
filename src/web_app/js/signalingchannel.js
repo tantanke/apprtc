@@ -60,7 +60,7 @@ SignalingChannel.prototype.open = function() {
 
     this.websocket_.onmessage = function(event) {
 
-      trace('WSS->C: ' + event.data);
+      trace('WSS->C: ');
       console.warn('收到消息！！！！！！')
       var message = parseJSON(event.data);
       if (!message) {

@@ -49,14 +49,14 @@ var PeerConnectionClient = function (params, startTime) {
       sessionId: this.params_.roomId
     }
   }));
-  this.targetUserIDMore = ''
+  this.targetUserIDMore = '';// 接受到all消息时指定targetID 接受时限定
   this.inInitCallee = false;
   this.hasRemoteSdp_ = false;
   this.messageQueue_ = [];
   this.isInitiator_ = false;
   this.started_ = false;
   this.connectIDs = null;
-  this.sendMoreTarget = '';
+  this.sendMoreTarget = '';// 接受到all消息时指定targetID 发送时限定
   this.firstSet = true;
   // TODO(jiayl): Replace callbacks with events.
   // Public callbacks. Keep it sorted.
@@ -239,12 +239,13 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
       // because it JSON.stringify won't include attributes which are on the
       // object's prototype chain. By creating the message to serialize
       // explicitly we can avoid the issue.
-      console.warn('准备发送本地sdp到信令服务器')
+      const target = this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
+      console.warn(`发送icecandidate local:${this.connectIDs.localUserID} target:${target}`)
       this.onsignalingmessage({
         sdp: sessionDescription.sdp,
         type: sessionDescription.type,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
+        targetUserID: target
       });
     }
   };
@@ -358,14 +359,15 @@ PeerConnectionClient.prototype.onIceCandidate_ = function (event) {
   if (event.candidate) {
     // Eat undesired candidates.
     if (this.filterIceCandidate_(event.candidate)) {
-      console.warn('发送icecandidate到信令服务器')
+      const target = this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
+      console.warn(`发送icecandidate local:${this.connectIDs.localUserID} target:${target}`)
       var message = {
         type: 'candidate',
         label: event.candidate.sdpMLineIndex,
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
         localUserID: this.connectIDs.localUserID,
-        targetUserID: this.targetUserIDMore || this.sendMoreTarget || this.connectIDs.targetUserID
+        targetUserID: target
       };
       if (this.onsignalingmessage) {
         this.onsignalingmessage(message);
