@@ -306,7 +306,7 @@ Call.prototype.startSignaling_ = function () {
         if (this.params_.isInitiator) {
           this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
         } else if (!this.params_.isInitiator) {
-          this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
+          this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs,true);
         }
       }.bind(this))
       .catch(function (e) {

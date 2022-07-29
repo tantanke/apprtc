@@ -50,6 +50,7 @@ var PeerConnectionClient = function (params, startTime) {
     }
   }));
   this.targetUserIDMore = ''
+  this.inInitCallee = false;
   this.hasRemoteSdp_ = false;
   this.messageQueue_ = [];
   this.isInitiator_ = false;
@@ -109,7 +110,7 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
 
   return true;
 };
-PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connectIDs) {
+PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connectIDs, inInitCallee) {
   if (!this.pc_) {
     return false;
   }
@@ -117,7 +118,7 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   if (this.started_) {
     return false;
   }
-
+  this.inInitCallee = inInitCallee
   this.isInitiator_ = false;
   this.started_ = true;
   this.connectIDs = connectIDs
@@ -268,7 +269,7 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   // so we can know if the peer has any remote video streams that we need
   // to wait for. Otherwise, transition immediately to the active state.
   var remoteStreams = this.pc_.getRemoteStreams();
-  console.log('远程流来了',remoteStreams,)
+  console.log('远程流来了', remoteStreams,)
   if (this.onremotesdpset) {
     this.onremotesdpset(remoteStreams.length > 0 &&
       remoteStreams[0].getVideoTracks().length > 0);
@@ -283,6 +284,11 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     return;
   }
   if (this.sendMoreTarget && this.sendMoreTarget !== message.localUserID.replaceAll(' ', '')) {
+    console.warn('收到了但是不应该回应！！')
+    console.log(this.connectIDs.localUserID, message.targetUserID)
+    return;
+  }
+  if (!this.inInitCallee && !message.targetUserID) {
     console.warn('收到了但是不应该回应！！')
     console.log(this.connectIDs.localUserID, message.targetUserID)
     return;
