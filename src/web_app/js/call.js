@@ -316,9 +316,11 @@ Call.prototype.startSignaling_ = function () {
   } else {
     console.log(this.params_.connectIDs.allOtherMembers)
     for (const item of this.params_.connectIDs.allOtherMembers) {
+      const _this = this
       this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
-        this.peerConnections[item].startAsCaller(this.params_.offerOptions, this.params_.connectIDs)
+        console.log(_this.peerConnections,this.peerConnections)
+        _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs)
       }.bind(this)).catch(function (e) {
         this.onError_('Create PeerConnection exception: ' + e);
         alert('Cannot create RTCPeerConnection: ' + e.message);
