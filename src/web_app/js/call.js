@@ -577,7 +577,7 @@ Call.prototype.sendSignalingMessage_ = function (message) {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', path, true);
     xhr.send(msgString);
-    trace('C->GAE: ' + msgString);
+    trace('C->GAE: '+this.params_.clientId);
   } else {
     this.channel_.send(msgString);
   }

@@ -256,6 +256,7 @@ PeerConnectionClient.prototype.setRemoteSdp_ = function (message) {
   message.sdp = maybeSetVideoSendBitRate(message.sdp, this.params_);
   message.sdp = maybeSetVideoSendInitialBitRate(message.sdp, this.params_);
   message.sdp = maybeRemoveVideoFec(message.sdp, this.params_);
+  console.warn(`设置${message.localUserID}发送的remotesdp`)
   this.pc_.setRemoteDescription(new RTCSessionDescription(message))
     .then(this.onSetRemoteDescriptionSuccess_.bind(this))
     .catch(this.onError_.bind(this, 'setRemoteDescription'));
