@@ -319,7 +319,7 @@ Call.prototype.startSignaling_ = function () {
       const _this = this
       this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
-        console.log(_this.peerConnections,this.peerConnections)
+        console.log(_this.peerConnections, this.peerConnections)
         _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs)
       }.bind(this)).catch(function (e) {
         this.onError_('Create PeerConnection exception: ' + e);
@@ -552,9 +552,12 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
   if (this.params_.room_user_count < 3 && messageObj.targetUserID !== 'all') {
     this.maybeCreatePcClientAsync_()
       .then(this.pcClient_.receiveSignalingMessage(msg));
-  } else if(messageObj.targetUserID === 'all') {
+  } else if (messageObj.targetUserID === 'all') {
+    console.log(_this.peerConnections, messageObj.localUserID)
     this.createPcClientThanTwo(messageObj.localUserID).then(
-      _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg)
+      function () {
+        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg)
+      }
     )
   }
 
