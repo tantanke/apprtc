@@ -236,7 +236,7 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
       // because it JSON.stringify won't include attributes which are on the
       // object's prototype chain. By creating the message to serialize
       // explicitly we can avoid the issue.
-      console.warn(`X${this.connectIDs.localUserID} target:${this.connectIDs.targetUserID}`)
+      console.warn(`发送sdp ${this.connectIDs.localUserID} target:${this.connectIDs.targetUserID}`)
       this.onsignalingmessage({
         sdp: sessionDescription.sdp,
         type: sessionDescription.type,
@@ -266,7 +266,7 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   // so we can know if the peer has any remote video streams that we need
   // to wait for. Otherwise, transition immediately to the active state.
   var remoteStreams = this.pc_.getRemoteStreams();
-  if (this.remoteStreams.length > 0) {
+  if (this.remoteStreams?.length) {
     this.isSeted = true
   }
   console.log('远程流来了', remoteStreams,)
@@ -283,7 +283,7 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   }
   // 一对一进行通信
   if (this.connectIDs.targetUserID !== message.localUserID.replaceAll(' ', '')) {
-    console.warn('收到了但是不应该回应！！')
+    console.warn(`收到了但是不应该回应 local:${this.connectIDs.localUserID} target:${message.targetUserID}`)
     return;
   }
   console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
@@ -332,7 +332,6 @@ PeerConnectionClient.prototype.drainMessageQueue_ = function () {
     return;
   }
   for (var i = 0, len = this.messageQueue_.length; i < len; i++) {
-    console.log(`正式开始处理to${this.messageQueue_[i].targetUserID}type:${this.messageQueue_[i].type}`)
     this.processSignalingMessage_(this.messageQueue_[i]);
   }
   this.messageQueue_ = [];
