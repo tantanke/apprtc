@@ -267,6 +267,7 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
         .then(function (cert) {
           trace('ECDSA certificate generated successfully.');
           this.params_.peerConnectionConfig.certificates = [cert];
+          console.warn(`${this.params_.connectIDs.localUserID} 创建了对 ${remoteUserID}的peer,配置信息为:`, this.params_)
           this.peerConnections[remoteUserID] = new PeerConnectionClient(this.params_, this.startTime);
           this.peerConnections[remoteUserID].onsignalingmessage = this.sendSignalingMessage_.bind(this);
           this.peerConnections[remoteUserID].onremotehangup = this.onremotehangup;
