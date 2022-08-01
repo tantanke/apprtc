@@ -495,14 +495,13 @@ class MessagePage(webapp2.RequestHandler):
     message_json = self.request.body
     result = save_message_from_client(
         self.request.host_url, room_id, client_id, message_json)
-    self.send_message_to_collider(room_id, client_id, message_json)
     if result['error'] is not None:
       self.write_response(result['error'])
       return
-    #if result['count']>1:
-       #self.send_message_to_collider(room_id, client_id, message_json)
-    #else:
-      #self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
+    if result['count']>1:
+        self.send_message_to_collider(room_id, client_id, message_json)
+    else:
+      self.write_response("SUCCESS BUT NOT SEND TO COLLIDER")
 
 class JoinPage(webapp2.RequestHandler):
   def write_response(self, result, params, messages):
