@@ -255,7 +255,9 @@ PeerConnectionClient.prototype.setRemoteSdp_ = function (message) {
     .then(this.onSetRemoteDescriptionSuccess_.bind(this))
     .catch(this.onError_.bind(this, 'setRemoteDescription'));
 };
-
+PeerConnectionClient.prototype.ontrack = function(event){
+  console.warn('媒体流改变',event)
+}
 PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   trace('Set remote session description success.');
   // By now all onaddstream events for the setRemoteDescription have fired,
