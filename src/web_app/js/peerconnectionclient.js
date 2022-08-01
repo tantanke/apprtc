@@ -55,7 +55,6 @@ var PeerConnectionClient = function (params, startTime) {
   this.isInitiator_ = false;
   this.started_ = false;
   this.connectIDs = null;
-  this.firstSet = true;
   // TODO(jiayl): Replace callbacks with events.
   // Public callbacks. Keep it sorted.
   this.onerror = null;
@@ -91,12 +90,11 @@ PeerConnectionClient.prototype.startAsCaller = function (offerOptions, connectID
   if (this.started_) {
     return false;
   }
-  this.connectIDs = connectIDs
-  if(config?.more){
+  this.connectIDs = { ...connectIDs }
+  if (config?.more) {
     this.connectIDs.targetUserID = config.targetUserID
   }
   this.started_ = true;
-  this.firstSet = false;
   var constraints = mergeConstraints(
     PeerConnectionClient.DEFAULT_SDP_OFFER_OPTIONS_, offerOptions);
   trace('Sending offer to peer, with constraints: \n\'' +
@@ -117,7 +115,6 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   this.isInitiator_ = false;
   this.started_ = true;
   this.connectIDs = connectIDs
-  this.firstSet = false
   if (initialMessages && initialMessages.length > 0) {
     // Convert received messages to JSON objects and add them to the message
     // queue.
@@ -146,8 +143,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
   // tag表示直接被新建用于响应
   if (tag && !this.started_) {
     this.started_ = true;
-    this.connectIDs = connectIDs
-    this.firstSet = false
+    this.connectIDs = { ...connectIDs }
   }
   if ((messageObj.type === 'answer') ||
     (messageObj.type === 'offer')) {
