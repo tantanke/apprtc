@@ -266,7 +266,7 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   // so we can know if the peer has any remote video streams that we need
   // to wait for. Otherwise, transition immediately to the active state.
   var remoteStreams = this.pc_.getRemoteStreams();
-  if (this.remoteStreams?.length) {
+  if (remoteStreams?.length) {
     this.isSeted = true
   }
   console.log('远程流来了', remoteStreams,)
