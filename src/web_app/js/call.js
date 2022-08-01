@@ -258,7 +258,7 @@ Call.prototype.createPcClient_ = function () {
 // 确保只有一个本地流 每个新的client被建立时 remove旧的本地流
 Call.prototype.createPcClientThanTwo = function (remoteUserID) {
   return new Promise(function (resolve, reject) {
-    console.log(111,remoteUserID,this.peerConnections,this.peerConnections[remoteUserID]?.clientId)
+    console.log(111,remoteUserID,this.peerConnections,this.peerConnections[remoteUserID],this.peerConnections?.remoteUserID)
     if (this.peerConnections[remoteUserID]?.clientId) {// 创建才进行创建
       console.warn('已有该客户端，拒绝创建！')
       resolve()
