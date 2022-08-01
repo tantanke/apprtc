@@ -261,6 +261,7 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
     if (this.peerConnections[remoteUserID]) {// 创建才进行创建
       resolve()
     }
+    console.log(111,remoteUserID,this.peerConnections,this.peerConnections[remoteUserID])
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
       var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
       RTCPeerConnection.generateCertificate(certParams)
@@ -284,7 +285,16 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
           reject(error);
         });
     } else {
-      this.createPcClient_();
+      console.warn(`${this.params_.connectIDs.localUserID} 创建了对 ${remoteUserID}的peer,配置信息为:`, this.params_)
+      this.peerConnections[remoteUserID] = new PeerConnectionClient(this.params_, this.startTime);
+      this.peerConnections[remoteUserID].onsignalingmessage = this.sendSignalingMessage_.bind(this);
+      this.peerConnections[remoteUserID].onremotehangup = this.onremotehangup;
+      this.peerConnections[remoteUserID].onremotesdpset = this.onremotesdpset;
+      this.peerConnections[remoteUserID].onremotestreamadded = this.onremotestreamadded;
+      this.peerConnections[remoteUserID].onsignalingstatechange = this.onsignalingstatechange;
+      this.peerConnections[remoteUserID].oniceconnectionstatechange = this.oniceconnectionstatechange;
+      this.peerConnections[remoteUserID].onnewicecandidate = this.onnewicecandidate;
+      this.peerConnections[remoteUserID].onerror = this.onerror;
       resolve();
     }
   }.bind(this));
@@ -319,7 +329,7 @@ Call.prototype.startSignaling_ = function () {
       const _this = this
       this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
-        console.log(_this.peerConnections, this.peerConnections)
+        console.log(_this.peerConnections)
         _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs, {
           more: true,
           targetUserID: item
@@ -562,8 +572,8 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
-      if(messageObj.targetUserID!==_this.params_.connectIDs.localUserID) {
-        return 
+      if (messageObj.targetUserID !== _this.params_.connectIDs.localUserID) {
+        return
       }
       this.createPcClientThanTwo(messageObj.localUserID).then(
         function () {
