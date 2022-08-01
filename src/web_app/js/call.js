@@ -264,10 +264,6 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
       resolve()
     }
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
-      if(this.peerConnections[remoteUserID]){
-        console.warn('已有该客户端，拒绝创建！')
-        resolve()
-      }
       var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
       RTCPeerConnection.generateCertificate(certParams)
         .then(function (cert) {
@@ -304,7 +300,7 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
     }
   }.bind(this));
 };
-Call.prototype.startSignaling_ = function () {
+Call.prototype.startSignaling_ = async function () {
   trace('Starting signaling.');
   if (this.isInitiator() && this.oncallerstarted) {
     this.oncallerstarted(this.params_.roomId, this.params_.roomLink);
@@ -332,7 +328,7 @@ Call.prototype.startSignaling_ = function () {
     console.log(this.params_.connectIDs.allOtherMembers)
     for (const item of this.params_.connectIDs.allOtherMembers) {
       const _this = this
-      this.createPcClientThanTwo(item).then(function () {
+      await this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
         console.log(_this.peerConnections)
         _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs, {
@@ -563,7 +559,7 @@ Call.prototype.joinRoom_ = function () {
   }.bind(this));
 };
 
-Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
+Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
   const messageObj = JSON.parse(msg)
   const _this = this
   console.log(`${_this.params_.connectIDs.localUserID} 收到 ${messageObj.localUserID}的发给${messageObj.targetUserID}的${messageObj.type}消息`)
@@ -580,7 +576,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
       if (messageObj.targetUserID !== _this.params_.connectIDs.localUserID) {
         return
       }
-      this.createPcClientThanTwo(messageObj.localUserID).then(
+      await this.createPcClientThanTwo(messageObj.localUserID).then(
         function () {
           _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
             targetUserID: messageObj.localUserID,
@@ -592,7 +588,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
 
   } else if (this.params_.room_user_count >= 3) { // count>=3时需要该循环
     console.log(`${messageObj.localUserID}状态：${_this.peerConnections[messageObj.localUserID]}`)
-    this.createPcClientThanTwo(messageObj.localUserID).then(
+    await this.createPcClientThanTwo(messageObj.localUserID).then(
       function () {
         _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
           targetUserID: messageObj.localUserID,
