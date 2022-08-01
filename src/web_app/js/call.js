@@ -263,8 +263,11 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
       console.warn('已有该客户端，拒绝创建！')
       resolve()
     }
-   
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
+      if(this.peerConnections[remoteUserID]){
+        console.warn('已有该客户端，拒绝创建！')
+        resolve()
+      }
       var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
       RTCPeerConnection.generateCertificate(certParams)
         .then(function (cert) {
