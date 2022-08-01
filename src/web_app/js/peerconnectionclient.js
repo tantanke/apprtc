@@ -282,7 +282,7 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     console.warn(`收到了但是不应该回应 local:${this.connectIDs.localUserID} target:${message.targetUserID}`)
     return;
   }
-  console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
+  console.warn(`开始处理 ${this.connectIDs.localUserID}收到的${message.localUserID}发送给${message.targetUserID}的${message.type}`)
   if (message.type === 'offer') {
     if (this.pc_.signalingState !== 'stable') {
       trace('ERROR: remote offer received in unexpected state: ' +
@@ -372,6 +372,7 @@ PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
     return;
   }
   trace('ICE connection state changed to: ' + this.pc_.iceConnectionState);
+  console.warn(`state变化 当前媒体流状态:`, this.pc_.getRemoteStreams())
   if (this.pc_.iceConnectionState === 'completed') {
     trace('ICE complete time: ' +
       (window.performance.now() - this.startTime_).toFixed(0) + 'ms.');
