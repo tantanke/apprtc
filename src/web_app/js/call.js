@@ -283,7 +283,7 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
         .then(function (cert) {
           trace('ECDSA certificate generated successfully.');
           this.params_.peerConnectionConfig.certificates = [cert];
-          createPcClientThanTwoItem(remoteUserID)
+          this.createPcClientThanTwoItem(remoteUserID)
           resolve();
         }.bind(this))
         .catch(function (error) {
@@ -291,7 +291,7 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
           reject(error);
         });
     } else {
-      createPcClientThanTwoItem(remoteUserID)
+      this.createPcClientThanTwoItem(remoteUserID)
       resolve();
     }
   }.bind(this));
