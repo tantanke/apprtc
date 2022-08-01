@@ -551,10 +551,10 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
   const messageObj = JSON.parse(msg)
   const _this = this
   console.log(`${_this.params_.connectIDs.localUserID} 收到 ${messageObj.localUserID}的发给${messageObj.targetUserID}的${messageObj.type}消息`)
-  if (messageObj.targetUserID && !['all', _this.params_.connectIDs.localUserID.replaceAll(' ', '')].includes(messageObj.targetUserID.replaceAll(' ', ''))) {
+  /* if (messageObj.targetUserID && !['all', _this.params_.connectIDs.localUserID.replaceAll(' ', '')].includes(messageObj.targetUserID.replaceAll(' ', ''))) {
     console.warn('不在发送名单中 拒绝回应')
     return;
-  }
+  } */
   if (this.params_.room_user_count < 3) {
     if ((this.pcClient_ && !this.pcClient_?.isSeted) || !this.pcClient_) {
       this.maybeCreatePcClientAsync_(messageObj.localUserID)

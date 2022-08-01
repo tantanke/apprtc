@@ -279,12 +279,11 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
 PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
   // 保持第一个创建房间的用户符合统一流程
   if (!this.connectIDs.targetUserID) {
-    this.connectIDs.targetUserID = message.targetUserID
+    this.connectIDs.targetUserID = message.localUserID
   }
   // 一对一进行通信
   if (this.connectIDs.targetUserID !== message.localUserID.replaceAll(' ', '')) {
     console.warn('收到了但是不应该回应！！')
-    console.warn('不在发送名单中 拒绝回应')
     return;
   }
   console.warn(`${this.connectIDs.localUserID}收到了${message.localUserID}发送给${message.targetUserID}的${message.type}`)
