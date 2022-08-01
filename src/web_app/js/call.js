@@ -561,7 +561,10 @@ Call.prototype.onRecvSignalingChannelMessage_ = function (msg) {
       this.maybeCreatePcClientAsync_(messageObj.localUserID)
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
-      //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建  
+      //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
+      if(messageObj.targetUserID!==_this.params_.connectIDs.localUserID) {
+        return 
+      }
       this.createPcClientThanTwo(messageObj.localUserID).then(
         function () {
           _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
