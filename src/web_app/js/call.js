@@ -324,7 +324,7 @@ Call.prototype.startSignaling_ = async function () {
     console.log(this.params_.connectIDs.allOtherMembers)
     for (const item of this.params_.connectIDs.allOtherMembers) {
       const _this = this
-      await this.createPcClientThanTwo(item).then(function () {
+      this.createPcClientThanTwo(item).then(function () {
         console.log(`为${item} 创建peer连接`)
         console.log(_this.peerConnections)
         _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs, {
