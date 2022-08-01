@@ -259,7 +259,7 @@ Call.prototype.createPcClient_ = function () {
 Call.prototype.createPcClientThanTwo = function (remoteUserID) {
   return new Promise(function (resolve, reject) {
     console.log(111,remoteUserID,this.peerConnections,this.peerConnections[remoteUserID],this.peerConnections?.remoteUserID)
-    if (this.peerConnections[remoteUserID]?.clientId) {// 创建才进行创建
+    if (this.peerConnections[remoteUserID]) {// 创建才进行创建
       console.warn('已有该客户端，拒绝创建！')
       resolve()
     }
