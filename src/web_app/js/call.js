@@ -279,33 +279,32 @@ Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
   this.peerConnections[remoteUserID].addStream(this.localStream_);
 }
 Call.prototype.createPcClientThanTwo = function (remoteUserID) {
-  setTimeout(() => {
-    return new Promise(function (resolve, reject) {
-      console.log(111, remoteUserID, this.peerConnections, this.peerConnections[remoteUserID], this.peerConnections?.remoteUserID)
-      if (this.peerConnections[remoteUserID]) {// 创建才进行创建
-        console.warn('已有该客户端，拒绝创建！')
-        resolve()
-      }
-      if (typeof RTCPeerConnection.generateCertificate === 'function') {
-        var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
-        RTCPeerConnection.generateCertificate(certParams)
-          .then(function (cert) {
-            trace('ECDSA certificate generated successfully.');
-            this.params_.peerConnectionConfig.certificates = [cert];
-            this.createPcClientThanTwoItem(remoteUserID)
-            resolve();
-          }.bind(this))
-          .catch(function (error) {
-            trace('ECDSA certificate generation failed.');
-            reject(error);
-          });
-      } else {
-        this.createPcClientThanTwoItem(remoteUserID)
-        resolve();
-      }
-    }.bind(this));
-  }, 0)
-
+  return new Promise(function (resolve, reject) {
+    console.log(remoteUserID,this.peerConnections, this.peerConnections[remoteUserID])
+    console.log(JSON.parse(this.peerConnections))
+    if (this.peerConnections[remoteUserID]) {// 创建才进行创建
+      console.warn('已有该客户端，拒绝创建！')
+      resolve()
+    }
+    console.log(`创建${remoteUserID}应答`)
+    if (typeof RTCPeerConnection.generateCertificate === 'function') {
+      var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
+      RTCPeerConnection.generateCertificate(certParams)
+        .then(function (cert) {
+          trace('ECDSA certificate generated successfully.');
+          this.params_.peerConnectionConfig.certificates = [cert];
+          this.createPcClientThanTwoItem(remoteUserID)
+          resolve();
+        }.bind(this))
+        .catch(function (error) {
+          trace('ECDSA certificate generation failed.');
+          reject(error);
+        });
+    } else {
+      this.createPcClientThanTwoItem(remoteUserID)
+      resolve();
+    }
+  }.bind(this));
 };
 Call.prototype.startSignaling_ = async function () {
   trace('Starting signaling.');
@@ -583,28 +582,20 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
       if (messageObj.targetUserID !== _this.params_.connectIDs.localUserID) {
         return
       }
-      await this.createPcClientThanTwo(messageObj.localUserID).then(
-        function () {
-          _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
-            targetUserID: messageObj.localUserID,
-            localUserID: _this.params_.connectIDs.localUserID
-          })
-        }
-      )
+      await this.createPcClientThanTwo(messageObj.localUserID)
+      _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
+        targetUserID: messageObj.localUserID,
+        localUserID: _this.params_.connectIDs.localUserID
+      })
     }
-
   } else if (this.params_.room_user_count >= 3) { // count>=3时需要该循环
     console.log(`${messageObj.localUserID}状态：${_this.peerConnections[messageObj.localUserID]}`)
-    await this.createPcClientThanTwo(messageObj.localUserID).then(
-      function () {
-        _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
-          targetUserID: messageObj.localUserID,
-          localUserID: _this.params_.connectIDs.localUserID
-        })
-      }
-    )
+    await this.createPcClientThanTwo(messageObj.localUserID)
+    _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
+      targetUserID: messageObj.localUserID,
+      localUserID: _this.params_.connectIDs.localUserID
+    })
   }
-
 };
 
 Call.prototype.sendSignalingMessage_ = function (message) {
