@@ -278,14 +278,14 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
   this.deactivate_(this.sharingDiv_);
   this.displayTurnStatus_('');
   trace('Remote stream added.');
-  console.warn('RemoteStream成功添加！', stream)
   if (this.remoteVideIDs.includes(stream.id)) {
-    return
+    console.log('重复添加视频流！')
   } else {
+    console.warn('RemoteStream成功添加！', stream)
     this.remoteVideIDs.push(stream.id)
-    this.infoBox_.getRemoteTrackIds(stream);
     var video = document.createElement('video');
     video.srcObject = stream;
+    video.id = stream.id;
     video.autoplay = true;
     video.muted = true;
     video.playsinline = true;
