@@ -278,10 +278,10 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
   this.deactivate_(this.sharingDiv_);
   this.displayTurnStatus_('');
   trace('Remote stream added.');
-  if (this.remoteVideIDs.includes(stream.id)) {
+  /* if (this.remoteVideIDs.includes(stream.id)) {
     console.log('重复添加视频流！')
   } else {
-    console.warn('RemoteStream成功添加！', stream)
+    console.warn('RemoteStream成功添加！', stream) */
     this.remoteVideIDs.push(stream.id)
     var video = document.createElement('video');
     const local = document.getElementById('local-video')
@@ -293,7 +293,7 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
     video.muted = true;
     video.playsinline = true;
     document.querySelector('.remote-videos').appendChild(video);
-  }
+  /* } */
 
 
   if (this.remoteVideoResetTimer_) {
