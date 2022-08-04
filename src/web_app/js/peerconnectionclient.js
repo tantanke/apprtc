@@ -371,6 +371,7 @@ PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
     return;
   }
   if (this.pc_.iceConnectionState == 'connected') {
+    this.onremotestreamadded(this.pc_.getRemoteStreams())
     this.isSeted = true
   }
   trace('ICE connection state changed to: ' + this.pc_.iceConnectionState);
