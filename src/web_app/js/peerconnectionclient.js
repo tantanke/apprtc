@@ -277,11 +277,11 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     this.connectIDs.targetUserID = message.localUserID
   }
   // 一对一进行通信
-  if (this.connectIDs.targetUserID.replaceAll(" ", '') != message.localUserID.replaceAll(" ", '')) {
+  /* if (this.connectIDs.targetUserID.replaceAll(" ", '') != message.localUserID.replaceAll(" ", '')) {
     console.log(this.connectIDs.localUserID,message.targetUserID)
     console.warn(`收到了但是不应该回应 local:${this.connectIDs.localUserID} target:${message.targetUserID}`)
     return;
-  }
+  } */
   console.warn(`开始处理 ${this.connectIDs.localUserID}收到的${message.localUserID}发送给${message.targetUserID}的${message.type}`)
   if (message.type === 'offer') {
     if (this.pc_.signalingState !== 'stable') {
