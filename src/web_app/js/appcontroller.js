@@ -284,6 +284,9 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
     console.warn('RemoteStream成功添加！', stream)
     this.remoteVideIDs.push(stream.id)
     var video = document.createElement('video');
+    const local = document.getElementById('local-video')
+    local.style.width = '400px'
+    local.style.height = '300px'
     video.srcObject = stream;
     video.id = stream.id;
     video.autoplay = true;
