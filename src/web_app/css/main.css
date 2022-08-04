@@ -167,7 +167,13 @@ label {
   opacity: 1;
   z-index: 2;
 }
-
+.remote-videos{
+  display: flex;
+}
+.remote-videos video{
+  height: 400px;
+  width: 600px;
+}
 #remote-video {
   display: none;
   height: 100%;
