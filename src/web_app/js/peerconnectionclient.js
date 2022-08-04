@@ -303,9 +303,15 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
       sdpMLineIndex: message.label,
       candidate: message.candidate
     });
+    const _this = this
+   
     this.recordIceCandidate_('Remote', candidate);
     this.pc_.addIceCandidate(candidate)
-      .then(trace.bind(null, 'Remote candidate added successfully.'))
+      .then(()=>{
+        _this.onremotestreamadded(this.pc_.getRemoteStreams()[0])
+        _this.isSeted = true
+        trace.bind(null, 'Remote candidate added successfully.')
+      })
       .catch(this.onError_.bind(this, 'addIceCandidate'));
   } else {
     trace('WARNING: unexpected message: ' + JSON.stringify(message));
@@ -370,10 +376,6 @@ PeerConnectionClient.prototype.onSignalingStateChanged_ = function () {
 PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
   if (!this.pc_) {
     return;
-  }
-  if (this.pc_.iceConnectionState == 'connected') {
-    this.onremotestreamadded(this.pc_.getRemoteStreams()[0])
-    this.isSeted = true
   }
   trace('ICE connection state changed to: ' + this.pc_.iceConnectionState);
   console.warn(`state变化 当前媒体流状态:`, this.pc_.getRemoteStreams())

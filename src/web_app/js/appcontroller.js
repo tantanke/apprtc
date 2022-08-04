@@ -278,6 +278,9 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
   this.deactivate_(this.sharingDiv_);
   this.displayTurnStatus_('');
   trace('Remote stream added.');
+  if (!stream?.id) {
+    return
+  }
   if (this.remoteVideIDs.includes(stream.id)) {
     document.getElementById(stream.id).srcObject = stream
     console.log('替换最新视频流！')
