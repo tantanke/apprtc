@@ -277,7 +277,8 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     this.connectIDs.targetUserID = message.localUserID
   }
   // 一对一进行通信
-  if (this.connectIDs.targetUserID.replaceAll(" ", '') !== message.localUserID.replaceAll(" ", '')) {
+  if (this.connectIDs.targetUserID.replaceAll(" ", '') != message.localUserID.replaceAll(" ", '')) {
+    console.log(this.connectIDs.localUserID,message.targetUserID)
     console.warn(`收到了但是不应该回应 local:${this.connectIDs.localUserID} target:${message.targetUserID}`)
     return;
   }
