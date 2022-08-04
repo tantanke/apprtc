@@ -27,7 +27,7 @@ var Call = function (params) {
   this.localStream_ = null;
   this.errorMessageQueue_ = [];
   this.startTime = null;
-
+  this.remoteStreams = [];
   // Public callbacks. Keep it sorted.
   this.oncallerstarted = null;
   this.onerror = null;
