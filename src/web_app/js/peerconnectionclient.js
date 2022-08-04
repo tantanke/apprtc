@@ -379,7 +379,17 @@ PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
     return;
   }
   if (this.pc_.iceConnectionState === 'connected') {
+    Toastify({
+      text: `客户端ID为：${this.connectIDs.targetUserID}的用户加入房间`,
+    }).showToast();
     this.onremotestreamadded(this.pc_.getRemoteStreams()[0])
+  }
+  // 以此为断开连接的信号
+  if(this.pc_.iceConnectionState === 'disconnected'){
+    Toastify({
+      text: `客户端ID为：${this.connectIDs.targetUserID}的用户退出房间`,
+    }).showToast();
+    console.warn(`${this.connectIDs.targetUserID}断开连接`)
   }
   trace('ICE connection state changed to: ' + this.pc_.iceConnectionState);
   console.warn(`state变化 当前媒体流状态:`, this.pc_.getRemoteStreams())

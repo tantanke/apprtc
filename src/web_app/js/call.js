@@ -182,11 +182,15 @@ Call.prototype.onRemoteHangup = function () {
   // On remote hangup this client becomes the new initiator.
   this.params_.isInitiator = true;
 
-  if (this.pcClient_) {
+  if (this.pcClient_ || this.peerConnections) {
     this.pcClient_.close();
     this.pcClient_ = null;
+    Object.keys(this.peerConnections).forEach(item => {
+      this.peerConnections[item].close()
+    })
+    this.peerConnections = {}
   }
-
+  
   this.startSignaling_();
 };
 
