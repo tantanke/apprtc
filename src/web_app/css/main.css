@@ -169,10 +169,12 @@ label {
 }
 .remote-videos{
   display: flex;
+  justify-content: center;
 }
 .remote-videos video{
   height: 400px;
   width: 600px;
+  margin-right: 20px;
 }
 #remote-video {
   display: none;
