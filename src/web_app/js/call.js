@@ -190,7 +190,7 @@ Call.prototype.onRemoteHangup = function () {
     })
     this.peerConnections = {}
   }
-  
+
   this.startSignaling_();
 };
 
@@ -279,30 +279,33 @@ Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
   this.peerConnections[remoteUserID].addStream(this.localStream_);
 }
 Call.prototype.createPcClientThanTwo = function (remoteUserID) {
-  return new Promise(function (resolve, reject) {
-    console.log(111, remoteUserID, this.peerConnections, this.peerConnections[remoteUserID], this.peerConnections?.remoteUserID)
-    if (this.peerConnections[remoteUserID]) {// 创建才进行创建
-      console.warn('已有该客户端，拒绝创建！')
-      resolve()
-    }
-    if (typeof RTCPeerConnection.generateCertificate === 'function') {
-      var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
-      RTCPeerConnection.generateCertificate(certParams)
-        .then(function (cert) {
-          trace('ECDSA certificate generated successfully.');
-          this.params_.peerConnectionConfig.certificates = [cert];
-          this.createPcClientThanTwoItem(remoteUserID)
-          resolve();
-        }.bind(this))
-        .catch(function (error) {
-          trace('ECDSA certificate generation failed.');
-          reject(error);
-        });
-    } else {
-      this.createPcClientThanTwoItem(remoteUserID)
-      resolve();
-    }
-  }.bind(this));
+  setTimeout(() => {
+    return new Promise(function (resolve, reject) {
+      console.log(111, remoteUserID, this.peerConnections, this.peerConnections[remoteUserID], this.peerConnections?.remoteUserID)
+      if (this.peerConnections[remoteUserID]) {// 创建才进行创建
+        console.warn('已有该客户端，拒绝创建！')
+        resolve()
+      }
+      if (typeof RTCPeerConnection.generateCertificate === 'function') {
+        var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
+        RTCPeerConnection.generateCertificate(certParams)
+          .then(function (cert) {
+            trace('ECDSA certificate generated successfully.');
+            this.params_.peerConnectionConfig.certificates = [cert];
+            this.createPcClientThanTwoItem(remoteUserID)
+            resolve();
+          }.bind(this))
+          .catch(function (error) {
+            trace('ECDSA certificate generation failed.');
+            reject(error);
+          });
+      } else {
+        this.createPcClientThanTwoItem(remoteUserID)
+        resolve();
+      }
+    }.bind(this));
+  }, 0)
+
 };
 Call.prototype.startSignaling_ = async function () {
   trace('Starting signaling.');
