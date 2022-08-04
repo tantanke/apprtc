@@ -155,6 +155,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     console.log('压入candidate消息到队列中')
     this.messageQueue_.push(messageObj);
   } else if (messageObj.type === 'bye') {
+    console.log(`${messageObj.localUserID}退出连接`)
     if (this.onremotehangup) {
       this.onremotehangup();
     }
@@ -304,10 +305,10 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
       candidate: message.candidate
     });
     const _this = this
-   
+
     this.recordIceCandidate_('Remote', candidate);
     this.pc_.addIceCandidate(candidate)
-      .then(()=>{
+      .then(() => {
         _this.onremotestreamadded(this.pc_.getRemoteStreams()[0])
         _this.isSeted = true
         trace.bind(null, 'Remote candidate added successfully.')
@@ -377,9 +378,13 @@ PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
   if (!this.pc_) {
     return;
   }
+  if (this.pc_.iceConnectionState === 'connected') {
+    this.onremotestreamadded(this.pc_.getRemoteStreams()[0])
+  }
   trace('ICE connection state changed to: ' + this.pc_.iceConnectionState);
   console.warn(`state变化 当前媒体流状态:`, this.pc_.getRemoteStreams())
   if (this.pc_.iceConnectionState === 'completed') {
+    this.onremotestreamadded(this.pc_.getRemoteStreams()[0])
     trace('ICE complete time: ' +
       (window.performance.now() - this.startTime_).toFixed(0) + 'ms.');
   }
