@@ -255,8 +255,8 @@ PeerConnectionClient.prototype.setRemoteSdp_ = function (message) {
     .then(this.onSetRemoteDescriptionSuccess_.bind(this))
     .catch(this.onError_.bind(this, 'setRemoteDescription'));
 };
-PeerConnectionClient.prototype.ontrack = function(event){
-  console.warn('媒体流改变',event)
+PeerConnectionClient.prototype.ontrack = function (event) {
+  console.warn('媒体流改变', event)
 }
 PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   trace('Set remote session description success.');
@@ -264,9 +264,6 @@ PeerConnectionClient.prototype.onSetRemoteDescriptionSuccess_ = function () {
   // so we can know if the peer has any remote video streams that we need
   // to wait for. Otherwise, transition immediately to the active state.
   var remoteStreams = this.pc_.getRemoteStreams();
-  if (remoteStreams?.length) {
-    this.isSeted = true
-  }
   console.log('远程流来了', remoteStreams,)
   if (this.onremotesdpset) {
     this.onremotesdpset(remoteStreams.length > 0 &&
@@ -372,6 +369,9 @@ PeerConnectionClient.prototype.onSignalingStateChanged_ = function () {
 PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
   if (!this.pc_) {
     return;
+  }
+  if (this.pc_.iceConnectionState == 'connected') {
+    this.isSeted = true
   }
   trace('ICE connection state changed to: ' + this.pc_.iceConnectionState);
   console.warn(`state变化 当前媒体流状态:`, this.pc_.getRemoteStreams())
