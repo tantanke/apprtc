@@ -155,10 +155,8 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     console.log('压入candidate消息到队列中')
     this.messageQueue_.push(messageObj);
   } else if (messageObj.type === 'bye') {
-   
-   
     if (this.onremotehangup) {
-      this.onremotehangup(this.connectIDs.targetUserID);
+      this.onremotehangup(messageObj.localUserID);
     }
   }
   this.drainMessageQueue_();

@@ -188,8 +188,7 @@ Call.prototype.onRemoteHangup = function (targetUserID) {
   if (this.pcClient_ || this.peerConnections) {
     this.pcClient_.close();
     this.pcClient_ = null;
-    this.peerConnections[targetUserID].close()
-    this.peerConnections[targetUserID] = null
+    this.peerConnections[targetUserID]?.close()
   }
 
   /* this.startSignaling_(); */
@@ -590,10 +589,11 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
-      console.log(`创建${messageObj.localUserID}应答`)
+      
       const res = await this.createPcClientThanTwo(messageObj.localUserID, messageObj.type === 'bye' ? true : false)
       if (res && !this.peerConnections[messageObj.localUserID]) {
         _this.peerConnections[messageObj.localUserID] = res
+        console.log(`创建${messageObj.localUserID}应答`)
       }
       _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
         targetUserID: messageObj.localUserID,
