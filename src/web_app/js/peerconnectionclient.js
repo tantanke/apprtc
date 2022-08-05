@@ -136,7 +136,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
   if (!messageObj) {
     return;
   }
-  if (this.isSeted) {
+  if (this.isSeted && messageObj.type!=='bye') {
     console.log('已经建立的连接不再处理消息！')
     return
   }
