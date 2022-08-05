@@ -288,11 +288,11 @@ Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
   // 增加本地流
 
 }
-Call.prototype.createPcClientThanTwo = function (remoteUserID) {
+Call.prototype.createPcClientThanTwo = function (remoteUserID, isBye = false) {
   return new Promise(function (resolve, reject) {
     console.log(remoteUserID, this.peerConnections, this.peerConnections[remoteUserID])
     console.log(JSON.stringify(this.peerConnections))
-    if (this.peerConnections[remoteUserID]) {// 创建才进行创建
+    if (this.peerConnections[remoteUserID] && !isBye) {// 创建才进行创建
       console.warn('已有该客户端，拒绝创建！')
       resolve(false)
     }
@@ -582,7 +582,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
-      const res = await this.createPcClientThanTwo(messageObj.localUserID)
+      const res = await this.createPcClientThanTwo(messageObj.localUserID, messageObj.type === 'bye' ? true : false)
       if (res && !this.peerConnections[messageObj.localUserID]) {
         _this.peerConnections[messageObj.localUserID] = res
       }
@@ -593,7 +593,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
     }
   } else if (this.params_.room_user_count >= 3) { // count>=3时需要该循环
     console.log(`${messageObj.localUserID}状态：${_this.peerConnections[messageObj.localUserID]}`)
-    const res = await this.createPcClientThanTwo(messageObj.localUserID)
+    const res = await this.createPcClientThanTwo(messageObj.localUserID, messageObj.type === 'bye' ? true : false)
     if (res && !this.peerConnections[messageObj.localUserID]) {
       _this.peerConnections[messageObj.localUserID] = res
     }
