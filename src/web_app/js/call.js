@@ -267,7 +267,7 @@ Call.prototype.createPcClient_ = function () {
 // 旧的参与者AB以targetUser：'all' 以及 this.peerConnections[c localUser]为标准建立
 // 确保只有一个本地流 每个新的client被建立时 remove旧的本地流
 Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
-  const newPeer = new PeerConnectionClient(this.params_, this.startTime);
+  let newPeer = new PeerConnectionClient(this.params_, this.startTime);
   newPeer.onsignalingmessage = this.sendSignalingMessage_.bind(this);
   newPeer.onremotehangup = this.onremotehangup;
   newPeer.onremotesdpset = this.onremotesdpset;
@@ -342,7 +342,7 @@ Call.prototype.startSignaling_ = async function () {
     console.log(this.params_.connectIDs.allOtherMembers)
     for (const item of this.params_.connectIDs.allOtherMembers) {
       const res = await this.createPcClientThanTwo(item)
-      if (res) {
+      if (res && !this.peerConnections[item]) {
         console.log(`为${item} 创建peer连接`)
         this.peerConnections[item] = res
         this.peerConnections[item].startAsCaller(this.params_.offerOptions, this.params_.connectIDs, {
