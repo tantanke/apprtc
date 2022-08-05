@@ -19,7 +19,7 @@
 var Call = function (params) {
   this.params_ = params;
   this.roomServer_ = params.roomServer || '';
-
+  this.rejoinTag = false
   this.channel_ = new SignalingChannel(params.wssUrl, params.wssPostUrl);
   this.channel_.onmessage = this.onRecvSignalingChannelMessage_.bind(this);
   this.pcClient_ = null;
@@ -182,7 +182,7 @@ Call.prototype.onRemoteHangup = function (targetUserID) {
   this.startTime = null;
 
   // On remote hangup this client becomes the new initiator.
-  this.params_.isInitiator = true;
+  this.rejoinTag = true
 
   if (this.pcClient_ || this.peerConnections) {
     this.pcClient_.close();
@@ -328,9 +328,9 @@ Call.prototype.startSignaling_ = async function () {
           trace('Adding local stream.');
           this.pcClient_.addStream(this.localStream_);
         }
-        if (this.params_.isInitiator) {
+        if (this.params_.isInitiator || rejoinTag) {
           this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
-        } else if (!this.params_.isInitiator) {
+        } else if (!this.params_.isInitiator && !rejoinTag) {
           this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
         }
       }.bind(this))
