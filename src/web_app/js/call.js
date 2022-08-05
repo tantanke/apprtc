@@ -582,9 +582,6 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
-      if (messageObj.targetUserID !== _this.params_.connectIDs.localUserID) {
-        return
-      }
       const res = await this.createPcClientThanTwo(messageObj.localUserID)
       if (res && !this.peerConnections[messageObj.localUserID]) {
         _this.peerConnections[messageObj.localUserID] = res
