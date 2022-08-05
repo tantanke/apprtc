@@ -135,6 +135,7 @@ Call.prototype.hangup = function (async) {
     step: function () {
       this.params_.previousRoomId = this.params_.roomId;
       this.params_.roomId = null;
+      this.rejoinTag = true
       this.params_.clientId = null;
     }.bind(this),
     errorString: 'Error setting params:'
@@ -182,7 +183,6 @@ Call.prototype.onRemoteHangup = function (targetUserID) {
   this.startTime = null;
 
   // On remote hangup this client becomes the new initiator.
-  this.rejoinTag = true
 
   if (this.pcClient_ || this.peerConnections) {
     this.pcClient_.close();
