@@ -342,14 +342,12 @@ Call.prototype.startSignaling_ = async function () {
     console.log(this.params_.connectIDs.allOtherMembers)
     for (const item of this.params_.connectIDs.allOtherMembers) {
       const res = await this.createPcClientThanTwo(item)
-      if (res && !this.peerConnections[item]) {
-        console.log(`为${item} 创建peer连接`)
-        this.peerConnections[item] = res
-        this.peerConnections[item].startAsCaller(this.params_.offerOptions, this.params_.connectIDs, {
-          more: true,
-          targetUserID: item
-        })
-      }
+      console.log(`为${item} 创建peer连接`)
+      this.peerConnections[item] = res
+      this.peerConnections[item].startAsCaller(this.params_.offerOptions, this.params_.connectIDs, {
+        more: true,
+        targetUserID: item
+      })
     }
   }
 };
@@ -588,7 +586,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
         return
       }
       const res = await this.createPcClientThanTwo(messageObj.localUserID)
-      if (res && !this.peerConnections[item]) {
+      if (res && !this.peerConnections[messageObj.localUserID]) {
         _this.peerConnections[messageObj.localUserID] = res
       }
       _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
@@ -599,7 +597,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
   } else if (this.params_.room_user_count >= 3) { // count>=3时需要该循环
     console.log(`${messageObj.localUserID}状态：${_this.peerConnections[messageObj.localUserID]}`)
     const res = await this.createPcClientThanTwo(messageObj.localUserID)
-    if (res && !this.peerConnections[item]) {
+    if (res && !this.peerConnections[messageObj.localUserID]) {
       _this.peerConnections[messageObj.localUserID] = res
     }
     _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
