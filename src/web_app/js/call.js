@@ -573,7 +573,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
   const _this = this
   if (messageObj.type === 'bye') {
     Toastify({
-      text: `客户端ID为：${_this.params_.connectIDs.targetUserID}的用户退出房间`,
+      text: `客户端ID为：${messageObj.localUserID}的用户退出房间`,
     }).showToast();
     const htmlVideo = document.querySelector('.video_' + messageObj.localUserID)
     htmlVideo.remove()
