@@ -29,6 +29,7 @@ var Call = function (params) {
   this.startTime = null;
   this.remoteStreams = [];
   this.newMessageQueue = {}
+  this.createCount = 0
   // Public callbacks. Keep it sorted.
   this.oncallerstarted = null;
   this.onerror = null;
@@ -275,12 +276,14 @@ Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
   newPeer.oniceconnectionstatechange = this.oniceconnectionstatechange;
   newPeer.onnewicecandidate = this.onnewicecandidate;
   newPeer.onerror = this.onerror;
-  console.warn(`${this.params_.connectIDs.localUserID} 创建了对 ${remoteUserID}的peer,配置信息为:`, this.params_)
+
   if (JSON.stringify(this.peerConnections).includes(remoteUserID)) {
     newPeer = null
+    return false
   } else {
+    console.warn(`${this.params_.connectIDs.localUserID} 创建了对 ${remoteUserID}的peer,配置信息为:`, this.params_)
     newPeer.addStream(this.localStream_);
-    this.peerConnections[remoteUserID] = newPeer
+    return newPeer
   }
   // 增加本地流
 
@@ -291,7 +294,7 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
     console.log(JSON.stringify(this.peerConnections))
     if (this.peerConnections[remoteUserID]) {// 创建才进行创建
       console.warn('已有该客户端，拒绝创建！')
-      resolve()
+      resolve(false)
     }
     console.log(`创建${remoteUserID}应答`)
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
@@ -300,16 +303,14 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID) {
         .then(function (cert) {
           trace('ECDSA certificate generated successfully.');
           this.params_.peerConnectionConfig.certificates = [cert];
-          this.createPcClientThanTwoItem(remoteUserID)
-          resolve();
+          resolve(this.createPcClientThanTwoItem(remoteUserID));
         }.bind(this))
         .catch(function (error) {
           trace('ECDSA certificate generation failed.');
           reject(error);
         });
     } else {
-      this.createPcClientThanTwoItem(remoteUserID)
-      resolve();
+      resolve(this.createPcClientThanTwoItem(remoteUserID));
     }
   }.bind(this));
 };
@@ -589,7 +590,10 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
       if (messageObj.targetUserID !== _this.params_.connectIDs.localUserID) {
         return
       }
-      await this.createPcClientThanTwo(messageObj.localUserID)
+      const res = await this.createPcClientThanTwo(messageObj.localUserID)
+      if (res) {
+        _this.peerConnections[messageObj.localUserID] = res
+      }
       _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
         targetUserID: messageObj.localUserID,
         localUserID: _this.params_.connectIDs.localUserID
@@ -597,7 +601,10 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
     }
   } else if (this.params_.room_user_count >= 3) { // count>=3时需要该循环
     console.log(`${messageObj.localUserID}状态：${_this.peerConnections[messageObj.localUserID]}`)
-    await this.createPcClientThanTwo(messageObj.localUserID)
+    const res = await this.createPcClientThanTwo(messageObj.localUserID)
+    if (res) {
+      _this.peerConnections[messageObj.localUserID] = res
+    }
     _this.peerConnections[messageObj.localUserID].receiveSignalingMessage(msg, true, {
       targetUserID: messageObj.localUserID,
       localUserID: _this.params_.connectIDs.localUserID
