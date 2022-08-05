@@ -341,18 +341,14 @@ Call.prototype.startSignaling_ = async function () {
   } else {
     console.log(this.params_.connectIDs.allOtherMembers)
     for (const item of this.params_.connectIDs.allOtherMembers) {
-      const _this = this
-      this.createPcClientThanTwo(item).then(function () {
+      const res = await this.createPcClientThanTwo(item)
+      if (res) {
         console.log(`为${item} 创建peer连接`)
-        console.log(_this.peerConnections)
-        _this.peerConnections[item].startAsCaller(_this.params_.offerOptions, _this.params_.connectIDs, {
+        this.peerConnections[item].startAsCaller(this.params_.offerOptions, this.params_.connectIDs, {
           more: true,
           targetUserID: item
         })
-      }.bind(this)).catch(function (e) {
-        this.onError_('Create PeerConnection exception: ' + e);
-        alert('Cannot create RTCPeerConnection: ' + e.message);
-      }.bind(this));
+      }
     }
   }
 };
