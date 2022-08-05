@@ -28,6 +28,7 @@ var Call = function (params) {
   this.errorMessageQueue_ = [];
   this.startTime = null;
   this.remoteStreams = [];
+  this.newMessageQueue = {}
   // Public callbacks. Keep it sorted.
   this.oncallerstarted = null;
   this.onerror = null;
@@ -265,22 +266,28 @@ Call.prototype.createPcClient_ = function () {
 // 旧的参与者AB以targetUser：'all' 以及 this.peerConnections[c localUser]为标准建立
 // 确保只有一个本地流 每个新的client被建立时 remove旧的本地流
 Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
+  const newPeer = new PeerConnectionClient(this.params_, this.startTime);
+  newPeer.onsignalingmessage = this.sendSignalingMessage_.bind(this);
+  newPeer.onremotehangup = this.onremotehangup;
+  newPeer.onremotesdpset = this.onremotesdpset;
+  newPeer.onremotestreamadded = this.onremotestreamadded;
+  newPeer.onsignalingstatechange = this.onsignalingstatechange;
+  newPeer.oniceconnectionstatechange = this.oniceconnectionstatechange;
+  newPeer.onnewicecandidate = this.onnewicecandidate;
+  newPeer.onerror = this.onerror;
   console.warn(`${this.params_.connectIDs.localUserID} 创建了对 ${remoteUserID}的peer,配置信息为:`, this.params_)
-  this.peerConnections[remoteUserID] = new PeerConnectionClient(this.params_, this.startTime);
-  this.peerConnections[remoteUserID].onsignalingmessage = this.sendSignalingMessage_.bind(this);
-  this.peerConnections[remoteUserID].onremotehangup = this.onremotehangup;
-  this.peerConnections[remoteUserID].onremotesdpset = this.onremotesdpset;
-  this.peerConnections[remoteUserID].onremotestreamadded = this.onremotestreamadded;
-  this.peerConnections[remoteUserID].onsignalingstatechange = this.onsignalingstatechange;
-  this.peerConnections[remoteUserID].oniceconnectionstatechange = this.oniceconnectionstatechange;
-  this.peerConnections[remoteUserID].onnewicecandidate = this.onnewicecandidate;
-  this.peerConnections[remoteUserID].onerror = this.onerror;
+  if (JSON.stringify(this.peerConnections).includes(remoteUserID)) {
+    newPeer = null
+  } else {
+    newPeer.addStream(this.localStream_);
+    this.peerConnections[remoteUserID] = newPeer
+  }
   // 增加本地流
-  this.peerConnections[remoteUserID].addStream(this.localStream_);
+
 }
 Call.prototype.createPcClientThanTwo = function (remoteUserID) {
   return new Promise(function (resolve, reject) {
-    console.log(remoteUserID,this.peerConnections, this.peerConnections[remoteUserID])
+    console.log(remoteUserID, this.peerConnections, this.peerConnections[remoteUserID])
     console.log(JSON.stringify(this.peerConnections))
     if (this.peerConnections[remoteUserID]) {// 创建才进行创建
       console.warn('已有该客户端，拒绝创建！')
@@ -596,6 +603,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
       localUserID: _this.params_.connectIDs.localUserID
     })
   }
+
 };
 
 Call.prototype.sendSignalingMessage_ = function (message) {
