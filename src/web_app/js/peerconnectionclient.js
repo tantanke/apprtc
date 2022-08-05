@@ -158,7 +158,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     Toastify({
       text: `客户端ID为：${this.connectIDs.targetUserID}的用户退出房间`,
     }).showToast();
-    document.querySelector('.video_' + messageObj.localUserID).remove()
+    document.querySelector('.video_' + messageObj.localUserID).srcObject = null
     if (this.onremotehangup) {
       this.onremotehangup();
     }
