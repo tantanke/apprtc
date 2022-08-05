@@ -299,6 +299,7 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
     video.muted = true;
     video.playsinline = true;
     document.querySelector('.remote-videos').appendChild(video);
+    this.show_(this.hangupSvg_);
   }
 
 
@@ -354,7 +355,6 @@ AppController.prototype.transitionToActive_ = function () {
   this.localVideo_.srcObject = null;
   // Rotate the div containing the videos 180 deg with a CSS transform.
   this.activate_(this.videosDiv_);
-  this.show_(this.hangupSvg_);
   this.displayStatus_('');
 };
 

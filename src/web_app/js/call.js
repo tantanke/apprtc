@@ -90,10 +90,10 @@ Call.prototype.hangup = function (async) {
   }
 
   if (this.pcClient_ || this.peerConnections) {
-    this.pcClient_.close();
+    this.pcClient_?.close();
     this.pcClient_ = null;
     Object.keys(this.peerConnections).forEach(item => {
-      this.peerConnections[item].close()
+      this.peerConnections[item]?.close()
     })
     this.peerConnections = {}
   }
@@ -120,7 +120,7 @@ Call.prototype.hangup = function (async) {
   steps.push({
     step: function () {
       // Send bye to the other client.
-      this.channel_.send(JSON.stringify({ type: 'bye', localUserID: this.params_.localUserID, }));
+      this.channel_.send(JSON.stringify({ type: 'bye', localUserID: this.params_.connectIDs.localUserID, }));
     }.bind(this),
     errorString: 'Error sending bye:'
   });
