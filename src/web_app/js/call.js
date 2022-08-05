@@ -328,9 +328,9 @@ Call.prototype.startSignaling_ = async function () {
           trace('Adding local stream.');
           this.pcClient_.addStream(this.localStream_);
         }
-        if (this.params_.isInitiator || rejoinTag) {
+        if (this.params_.isInitiator || this.rejoinTag) {
           this.pcClient_.startAsCaller(this.params_.offerOptions, this.params_.connectIDs);
-        } else if (!this.params_.isInitiator && !rejoinTag) {
+        } else if (!this.params_.isInitiator && !this.rejoinTag) {
           this.pcClient_.startAsCallee(this.params_.messages, this.params_.connectIDs);
         }
       }.bind(this))
