@@ -178,7 +178,7 @@ Call.prototype.getLeaveUrl_ = function () {
     '/' + this.params_.clientId;
 };
 
-Call.prototype.onRemoteHangup = function () {
+Call.prototype.onRemoteHangup = function (targetUserID) {
   this.startTime = null;
 
   // On remote hangup this client becomes the new initiator.
@@ -187,13 +187,11 @@ Call.prototype.onRemoteHangup = function () {
   if (this.pcClient_ || this.peerConnections) {
     this.pcClient_.close();
     this.pcClient_ = null;
-    Object.keys(this.peerConnections).forEach(item => {
-      this.peerConnections[item].close()
-    })
-    this.peerConnections = {}
+    this.peerConnections[targetUserID].close()
+    this.peerConnections[targetUserID] = null
   }
 
-  this.startSignaling_();
+  /* this.startSignaling_(); */
 };
 
 Call.prototype.getPeerConnectionStates = function () {
@@ -295,8 +293,8 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID, isBye = false) {
       console.warn('已有该客户端，拒绝创建！')
       resolve(false)
     }
-    if(isBye){
-      return false
+    if (isBye) {
+      resolve(false)
     }
     console.log(`创建${remoteUserID}应答`)
     if (typeof RTCPeerConnection.generateCertificate === 'function') {

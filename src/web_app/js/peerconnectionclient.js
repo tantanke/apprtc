@@ -161,7 +161,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     const htmlVideo = document.querySelector('.video_' + messageObj.localUserID)
     htmlVideo.style.display = 'none'
     if (this.onremotehangup) {
-      this.onremotehangup();
+      this.onremotehangup(this.connectIDs.targetUserID);
     }
   }
   this.drainMessageQueue_();
