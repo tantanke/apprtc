@@ -300,7 +300,7 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
     video.muted = true;
     video.playsinline = true;
     if (targetUserID) {
-      video.classList.add(targetUserID)
+      video.classList.add('video_'+targetUserID)
     }
     document.querySelector('.remote-videos').appendChild(video);
     this.show_(this.hangupSvg_);
