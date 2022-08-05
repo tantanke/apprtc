@@ -169,6 +169,8 @@ label {
 }
 .remote-videos{
   display: flex;
+  width: 100vw;
+  min-height: 420px;
   justify-content: center;
 }
 .remote-videos video{

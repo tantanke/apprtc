@@ -155,11 +155,8 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     console.log('压入candidate消息到队列中')
     this.messageQueue_.push(messageObj);
   } else if (messageObj.type === 'bye') {
-    Toastify({
-      text: `客户端ID为：${this.connectIDs.targetUserID}的用户退出房间`,
-    }).showToast();
-    const htmlVideo = document.querySelector('.video_' + messageObj.localUserID)
-    htmlVideo.style.display = 'none'
+   
+   
     if (this.onremotehangup) {
       this.onremotehangup(this.connectIDs.targetUserID);
     }
