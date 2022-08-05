@@ -107,7 +107,7 @@ Call.prototype.hangup = function (async) {
   // where it is called from. When the browser is closed, the requests must
   // be executed as sync to finish before the browser closes. When called
   // from pressing the hang up button, the requests are executed async.
-
+  // 为什么关闭浏览器为同步执行？点击挂起为异步？
   var steps = [];
   steps.push({
     step: function () {
@@ -572,7 +572,7 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
   const messageObj = JSON.parse(msg)
   const _this = this
   console.log(`${_this.params_.connectIDs.localUserID} 收到 ${messageObj.localUserID}的发给${messageObj.targetUserID}的${messageObj.type}消息`)
-  if (messageObj.targetUserID && !['all', _this.params_.connectIDs.localUserID.replaceAll(' ', '')].includes(messageObj.targetUserID.replaceAll(' ', ''))) {
+  if (messageObj.type !== 'bye' && messageObj.targetUserID && !['all', _this.params_.connectIDs.localUserID.replaceAll(' ', '')].includes(messageObj.targetUserID.replaceAll(' ', ''))) {
     console.warn('不在发送名单中 拒绝回应')
     return;
   }

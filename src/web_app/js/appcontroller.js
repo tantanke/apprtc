@@ -274,7 +274,7 @@ AppController.prototype.waitForRemoteVideo_ = function () {
   }
 };
 
-AppController.prototype.onRemoteStreamAdded_ = function (stream) {
+AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = '') {
   this.deactivate_(this.sharingDiv_);
   this.displayTurnStatus_('');
   trace('Remote stream added.');
@@ -285,6 +285,7 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
     document.getElementById(stream.id).srcObject = stream
     console.log('替换最新视频流！')
   } else {
+
     console.warn('RemoteStream成功添加！', stream)
     this.remoteVideIDs.push(stream.id)
     var video = document.createElement('video');
@@ -298,6 +299,9 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream) {
     video.autoplay = true;
     video.muted = true;
     video.playsinline = true;
+    if (targetUserID) {
+      video.classList.add(targetUserID)
+    }
     document.querySelector('.remote-videos').appendChild(video);
     this.show_(this.hangupSvg_);
   }
