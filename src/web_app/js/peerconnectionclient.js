@@ -158,7 +158,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     Toastify({
       text: `客户端ID为：${this.connectIDs.targetUserID}的用户退出房间`,
     }).showToast();
-    document.querySelector(message.localUserID).remove()
+    document.querySelector('.' + message.localUserID).remove()
     if (this.onremotehangup) {
       this.onremotehangup();
     }
@@ -312,7 +312,7 @@ PeerConnectionClient.prototype.processSignalingMessage_ = function (message) {
     this.recordIceCandidate_('Remote', candidate);
     this.pc_.addIceCandidate(candidate)
       .then(() => {
-        _this.onremotestreamadded(this.pc_.getRemoteStreams()[0],this.connectIDs.targetUserID)
+        _this.onremotestreamadded(this.pc_.getRemoteStreams()[0], this.connectIDs.targetUserID)
         _this.isSeted = true
         trace.bind(null, 'Remote candidate added successfully.')
       })
@@ -385,7 +385,7 @@ PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
     Toastify({
       text: `与客户端ID为：${this.connectIDs.targetUserID}的用户建立连接`,
     }).showToast();
-    this.onremotestreamadded(this.pc_.getRemoteStreams()[0],this.connectIDs.targetUserID)
+    this.onremotestreamadded(this.pc_.getRemoteStreams()[0], this.connectIDs.targetUserID)
   }
   // 以此为断开连接的信号
   if (this.pc_.iceConnectionState === 'disconnected') {
@@ -394,7 +394,7 @@ PeerConnectionClient.prototype.onIceConnectionStateChanged_ = function () {
   trace('ICE connection state changed to: ' + this.pc_.iceConnectionState);
   console.warn(`state变化 当前媒体流状态:`, this.pc_.getRemoteStreams())
   if (this.pc_.iceConnectionState === 'completed') {
-    this.onremotestreamadded(this.pc_.getRemoteStreams()[0],this.connectIDs.targetUserID)
+    this.onremotestreamadded(this.pc_.getRemoteStreams()[0], this.connectIDs.targetUserID)
     trace('ICE complete time: ' +
       (window.performance.now() - this.startTime_).toFixed(0) + 'ms.');
   }
@@ -431,7 +431,7 @@ PeerConnectionClient.prototype.recordIceCandidate_ =
 
 PeerConnectionClient.prototype.onRemoteStreamAdded_ = function (event) {
   if (this.onremotestreamadded) {
-    this.onremotestreamadded(event.streams[0],this.connectIDs.targetUserID);
+    this.onremotestreamadded(event.streams[0], this.connectIDs.targetUserID);
   }
 };
 
