@@ -24,7 +24,7 @@ import analytics
 import analytics_page
 import compute_page
 import constants
-MAX_USER_COUNT = 3
+MAX_USER_COUNT = 5
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
