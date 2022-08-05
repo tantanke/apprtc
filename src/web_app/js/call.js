@@ -277,7 +277,7 @@ Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
   newPeer.onnewicecandidate = this.onnewicecandidate;
   newPeer.onerror = this.onerror;
 
-  if (JSON.stringify(this.peerConnections).includes(remoteUserID)) {
+  if (this.peerConnections[remoteUserID]) {
     newPeer = null
     return false
   } else {
