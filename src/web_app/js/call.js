@@ -291,10 +291,12 @@ Call.prototype.createPcClientThanTwoItem = function (remoteUserID) {
 Call.prototype.createPcClientThanTwo = function (remoteUserID, isBye = false) {
   return new Promise(function (resolve, reject) {
     console.log(remoteUserID, this.peerConnections, this.peerConnections[remoteUserID])
-    console.log(JSON.stringify(this.peerConnections))
-    if (this.peerConnections[remoteUserID] && !isBye) {// 创建才进行创建
+    if (this.peerConnections[remoteUserID]) {// 创建才进行创建
       console.warn('已有该客户端，拒绝创建！')
       resolve(false)
+    }
+    if(isBye){
+      return false
     }
     console.log(`创建${remoteUserID}应答`)
     if (typeof RTCPeerConnection.generateCertificate === 'function') {

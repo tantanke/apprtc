@@ -567,7 +567,7 @@ class RoomPage(webapp2.RequestHandler):
         get_memcache_key_for_room(maybe_use_https_host_url(self.request), room_id))
     if room is not None:
       logging.info('Room ' + room_id + ' has state ' + str(room))
-      if room.get_occupancy() >= 3:
+      if room.get_occupancy() >= MAX_USER_COUNT:
         logging.info('Room ' + room_id + ' is full')
         self.write_response('full_template.html')
         return
