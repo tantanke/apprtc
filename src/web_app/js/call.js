@@ -120,7 +120,8 @@ Call.prototype.hangup = function (async) {
   steps.push({
     step: function () {
       // Send bye to the other client.
-      this.channel_.send(JSON.stringify({ type: 'bye', localUserID: this.params_.connectIDs.localUserID, }));
+      console.warn(`${this.params_.connectIDs.localUserID}发送bye`)
+      this.channel_.send(JSON.stringify({ type: 'bye', localUserID: this.params_.connectIDs.localUserID }));
     }.bind(this),
     errorString: 'Error sending bye:'
   });
@@ -296,7 +297,6 @@ Call.prototype.createPcClientThanTwo = function (remoteUserID, isBye = false) {
     if (isBye) {
       resolve(false)
     }
-    console.log(`创建${remoteUserID}应答`)
     if (typeof RTCPeerConnection.generateCertificate === 'function') {
       var certParams = { name: 'ECDSA', namedCurve: 'P-256' };
       RTCPeerConnection.generateCertificate(certParams)
@@ -571,17 +571,26 @@ Call.prototype.joinRoom_ = function () {
 Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
   const messageObj = JSON.parse(msg)
   const _this = this
+  if (messageObj.type === 'bye') {
+    Toastify({
+      text: `客户端ID为：${_this.params_.connectIDs.targetUserID}的用户退出房间`,
+    }).showToast();
+    const htmlVideo = document.querySelector('.video_' + messageObj.localUserID)
+    htmlVideo.remove()
+  }
   console.log(`${_this.params_.connectIDs.localUserID} 收到 ${messageObj.localUserID}的发给${messageObj.targetUserID}的${messageObj.type}消息`)
   if (messageObj.type !== 'bye' && messageObj.targetUserID && !['all', _this.params_.connectIDs.localUserID.replaceAll(' ', '')].includes(messageObj.targetUserID.replaceAll(' ', ''))) {
-    console.warn('不在发送名单中 拒绝回应')
+    console.warn('不在发送名单或者该消息为bye 拒绝回应')
     return;
   }
+
   if (this.params_.room_user_count < 3) {
     if ((this.pcClient_ && !this.pcClient_?.isSeted) || !this.pcClient_) {
       this.maybeCreatePcClientAsync_(messageObj.localUserID)
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
+      console.log(`创建${remoteUserID}应答`)
       const res = await this.createPcClientThanTwo(messageObj.localUserID, messageObj.type === 'bye' ? true : false)
       if (res && !this.peerConnections[messageObj.localUserID]) {
         _this.peerConnections[messageObj.localUserID] = res
