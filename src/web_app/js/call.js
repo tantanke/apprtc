@@ -23,6 +23,7 @@ var Call = function (params) {
   this.channel_ = new SignalingChannel(params.wssUrl, params.wssPostUrl);
   this.channel_.onmessage = this.onRecvSignalingChannelMessage_.bind(this);
   this.pcClient_ = null;
+  this.callerMore = false;
   this.peerConnections = {}
   this.localStream_ = null;
   this.errorMessageQueue_ = [];
@@ -184,14 +185,10 @@ Call.prototype.onRemoteHangup = function (targetUserID) {
   this.startTime = null;
 
   // On remote hangup this client becomes the new initiator.
-
-  if (this.pcClient_ || this.peerConnections) {
-    this.pcClient_.close();
-    this.pcClient_ = null;
+  this.callerMore = true
+  if (this.peerConnections) {
     this.peerConnections[targetUserID]?.close()
   }
-
-  /* this.startSignaling_(); */
 };
 
 Call.prototype.getPeerConnectionStates = function () {
@@ -584,12 +581,11 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
   }
 
   if (this.params_.room_user_count < 3) {
-    if ((this.pcClient_ && !this.pcClient_?.isSeted) || !this.pcClient_) {
+    if (((this.pcClient_ && !this.pcClient_?.isSeted) || !this.pcClient_) && !this.callerMore) {
       this.maybeCreatePcClientAsync_(messageObj.localUserID)
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
-      
       const res = await this.createPcClientThanTwo(messageObj.localUserID, messageObj.type === 'bye' ? true : false)
       if (res && !this.peerConnections[messageObj.localUserID]) {
         _this.peerConnections[messageObj.localUserID] = res
