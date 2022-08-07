@@ -309,16 +309,15 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
       console.log('不更新本地流描述！')
     } else {
       const localSpan = document.createElement('span')
-      localSpan.textContent = '本地流'
+      localSpan.textContent = '本地流：'
       localSpan.classList.add('local_span')
       local.parentNode.insertBefore(localSpan, null)
     }
     if (document.querySelector('.remote_span')) {
-      const remoteSpan = document.createElement('span')
-      remoteSpan.textContent = `远程流数量:${videoInner.children.length + 1}`
+      console.log('不更新远程流描述！')
     } else {
       const remoteSpan = document.createElement('span')
-      remoteSpan.textContent = `远程流数量:${videoInner.children.length}`
+      remoteSpan.textContent = `远程流：`
       remoteSpan.classList.add('remote_span')
       videoInner.parentNode.insertBefore(remoteSpan, null)
     }

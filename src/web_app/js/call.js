@@ -574,8 +574,6 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
     // 保证显示正确
     const htmlVideo = document.querySelector('.video_' + messageObj.localUserID)
     const videoInner = document.querySelector('.remote-videos')
-    const remoteSpan = document.querySelector('.remote_span')
-    remoteSpan.textContent = `远程流数量:${videoInner.children.length === 1 ? 0 : videoInner.children.length - 1}`
     if (videoInner.children.length === 0) {
       videoInner.classList.remove('has-remote')
     }
