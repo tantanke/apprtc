@@ -315,10 +315,10 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
       local.parentNode.insertBefore(localSpan, null)
     }
     if (document.querySelector('.remote_span')) {
-      remoteSpan.textContent = `当前远程流数量:${videoInner.childNodes.length}`
+      remoteSpan.textContent = `远程流数量:${videoInner.children.length}`
     } else {
       const remoteSpan = document.createElement('span')
-      remoteSpan.textContent = `当前远程流数量:${videoInner.childNodes.length}`
+      remoteSpan.textContent = `当前远程流数量:${videoInner.children.length}`
       remoteSpan.classList.add('remote_span')
       videoInner.parentNode.insertBefore(remoteSpan, null)
     }
