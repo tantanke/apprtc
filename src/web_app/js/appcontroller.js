@@ -311,7 +311,7 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
     } else {
       const localSpan = document.createElement('span')
       localSpan.textContent = '本地流'
-      localSpan.classList.add = 'local_span'
+      localSpan.classList.add('local_span')
       local.parentNode.insertBefore(localSpan, null)
     }
     if (document.querySelector('.remote_span')) {
@@ -319,7 +319,7 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
     } else {
       const remoteSpan = document.createElement('span')
       remoteSpan.textContent = `当前远程流数量:${videoInner.childNodes.length}`
-      remoteSpan.classList.add = 'remote_span'
+      remoteSpan.classList.add('remote_span')
       videoInner.parentNode.insertBefore(remoteSpan, null)
     }
 
