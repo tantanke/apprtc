@@ -284,12 +284,8 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
   if (this.remoteVideIDs.includes(stream.id)) {
     const video = document.getElementById(stream.id)
     video.srcObject = stream
-   /*  if(video.style.display === 'none'){
-
-    }
-    console.log('替换最新视频流！') */
+    this.show_(this.hangupSvg_);
   } else {
-
     console.warn('RemoteStream成功添加！', stream)
     this.remoteVideIDs.push(stream.id)
     var video = document.createElement('video');

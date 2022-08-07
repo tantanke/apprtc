@@ -131,12 +131,12 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   return true;
 };
 
-PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag = false, connectIDs) {
+PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag = false, connectIDs = {}) {
   var messageObj = parseJSON(message);
   if (!messageObj) {
     return;
   }
-  if (this.isSeted && messageObj.type!=='bye') {
+  if (this.isSeted && messageObj.type !== 'bye') {
     console.log('已经建立的连接不再处理消息！')
     return
   }
@@ -156,7 +156,7 @@ PeerConnectionClient.prototype.receiveSignalingMessage = function (message, tag 
     this.messageQueue_.push(messageObj);
   } else if (messageObj.type === 'bye') {
     if (this.onremotehangup) {
-      this.onremotehangup(messageObj.localUserID);
+      this.onremotehangup(messageObj?.localUserID || '');
     }
   }
   this.drainMessageQueue_();

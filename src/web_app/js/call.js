@@ -183,7 +183,7 @@ Call.prototype.getLeaveUrl_ = function () {
 
 Call.prototype.onRemoteHangup = function (targetUserID) {
   this.startTime = null;
-  console.log(targetUserID+'有远程流退出')
+  console.log(targetUserID + '有远程流退出')
   // On remote hangup this client becomes the new initiator.
   this.callerMore = true
   if (this.peerConnections) {
@@ -575,14 +575,13 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
     htmlVideo.remove()
   }
   console.log(`${_this.params_.connectIDs.localUserID} 收到 ${messageObj.localUserID}的发给${messageObj.targetUserID}的${messageObj.type}消息`)
-  if (messageObj.type !== 'bye' && messageObj.targetUserID && !['all', _this.params_.connectIDs.localUserID.replaceAll(' ', '')].includes(messageObj.targetUserID.replaceAll(' ', ''))) {
+  if (messageObj.type !== 'bye' && messageObj.targetUserID && !['all', _this.params_.connectIDs.localUserID].includes(messageObj.targetUserID)) {
     console.warn('不在发送名单或者该消息为bye 拒绝回应')
     return;
   }
-
   if (this.params_.room_user_count < 3) {
-    if (((this.pcClient_ && !this.pcClient_?.isSeted) || !this.pcClient_) && !this.callerMore) {
-      this.maybeCreatePcClientAsync_(messageObj.localUserID)
+    if ((!messageObj?.localUserID && !messageObj?.targetUserID && this.pcClient_) || (((this.pcClient_ && !this.pcClient_?.isSeted) || !this.pcClient_) && !this.callerMore)) {
+      this.maybeCreatePcClientAsync_()
         .then(this.pcClient_.receiveSignalingMessage(msg));
     } else {
       //以远程流的添加来判断是否被建立过，如果被建立过直接再次新建 
