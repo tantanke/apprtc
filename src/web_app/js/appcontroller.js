@@ -384,8 +384,8 @@ AppController.prototype.transitionToWaiting_ = function () {
 
   // Set localVideo.srcObject now so that the local stream won't be lost if the
   // call is restarted before the timeout.
-  this.localVideo_.srcObject = this.miniVideo_.srcObject;
-
+  /* this.localVideo_.srcObject = this.miniVideo_.srcObject;
+ */
   // Transition opacity from 0 to 1 for the local video.
   this.activate_(this.localVideo_);
   // Transition opacity from 1 to 0 for the remote and mini videos.

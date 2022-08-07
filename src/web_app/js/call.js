@@ -183,7 +183,7 @@ Call.prototype.getLeaveUrl_ = function () {
 
 Call.prototype.onRemoteHangup = function (targetUserID) {
   this.startTime = null;
-
+  console.log(targetUserID+'有远程流退出')
   // On remote hangup this client becomes the new initiator.
   this.callerMore = true
   if (this.peerConnections) {
