@@ -170,8 +170,11 @@ label {
 .remote-videos{
   display: flex;
   width: 100vw;
-  min-height: 420px;
   justify-content: center;
+}
+.has-remote{
+  min-height: 420px;
+  border-bottom: 2px solid gainsboro;
 }
 .remote-videos video{
   height: 400px;

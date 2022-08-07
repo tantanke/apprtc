@@ -572,6 +572,10 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
       text: `客户端ID为：${messageObj.localUserID}的用户退出房间`,
     }).showToast();
     const htmlVideo = document.querySelector('.video_' + messageObj.localUserID)
+    const videoInner = document.querySelector('.remote-videos')
+    if(videoInner.childNodes.length===0){
+      videoInner.classList.remove('has-remote')
+    }
     htmlVideo.remove()
   }
   console.log(`${_this.params_.connectIDs.localUserID} 收到 ${messageObj.localUserID}的发给${messageObj.targetUserID}的${messageObj.type}消息`)
