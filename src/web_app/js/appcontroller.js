@@ -247,9 +247,6 @@ AppController.prototype.hangup_ = function () {
 AppController.prototype.onRemoteHangup_ = function () {
   /* this.displayStatus_('The remote side hung up.'); */
   this.transitionToWaiting_();
-  // 保证显示正确
-  const videoInner = document.querySelector('.remote-videos')
-  remoteSpan.textContent = `远程流数量:${videoInner.children.length}`
   this.call_.onRemoteHangup();
 };
 

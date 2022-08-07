@@ -571,9 +571,12 @@ Call.prototype.onRecvSignalingChannelMessage_ = async function (msg) {
     Toastify({
       text: `客户端ID为：${messageObj.localUserID}的用户退出房间`,
     }).showToast();
+    // 保证显示正确
     const htmlVideo = document.querySelector('.video_' + messageObj.localUserID)
     const videoInner = document.querySelector('.remote-videos')
-    if(videoInner.childNodes.length===0){
+    const remoteSpan = document.querySelector('.remote_span')
+    remoteSpan.textContent = `远程流数量:${videoInner.children.length}`
+    if (videoInner.children.length === 0) {
       videoInner.classList.remove('has-remote')
     }
     htmlVideo.remove()

@@ -176,7 +176,6 @@ label {
   color: red;
   font-size: 18px;
   height: 20px;
-  width: 120px;
   position: absolute;
   top: 10px;
   left: 10px;
@@ -184,7 +183,6 @@ label {
 .local_span{
   color: green;
   font-size: 18px;
-  width: 40px;
   left: 10px;
   position: absolute;
 }
