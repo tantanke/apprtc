@@ -290,10 +290,6 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
     this.remoteVideIDs.push(stream.id)
     var video = document.createElement('video');
     const local = document.getElementById('local-video')
-    const localSpan = document.createElement('span')
-    localSpan.textContent = '本地流'
-    localSpan.classList.add = 'local_span'
-    local.insertBefore(localSpan,null)
     local.style.width = '400px'
     local.style.height = '300px'
     local.style.position = 'relative'
@@ -307,12 +303,27 @@ AppController.prototype.onRemoteStreamAdded_ = function (stream, targetUserID = 
       video.classList.add('video_' + targetUserID)
     }
     const videoInner = document.querySelector('.remote-videos')
-    const remoteSpan = document.createElement('span')
-    remoteSpan.textContent = `当前远程流数量:${videoInner.childNodes.length}`
-    remoteSpan.classList.add = 'remote_span'
-    videoInner.insertBefore(remoteSpan,null)
     videoInner.classList.add('has-remote')
     videoInner.appendChild(video);
+    // 更新描述
+    if (document.querySelector('.local_span')) {
+      console.log('不更新本地流描述！')
+    } else {
+      const localSpan = document.createElement('span')
+      localSpan.textContent = '本地流'
+      localSpan.classList.add = 'local_span'
+      local.parentNode.insertBefore(localSpan, null)
+    }
+    if (document.querySelector('.remote_span')) {
+      remoteSpan.textContent = `当前远程流数量:${videoInner.childNodes.length}`
+    } else {
+      const remoteSpan = document.createElement('span')
+      remoteSpan.textContent = `当前远程流数量:${videoInner.childNodes.length}`
+      remoteSpan.classList.add = 'remote_span'
+      videoInner.parentNode.insertBefore(remoteSpan, null)
+    }
+
+
     this.show_(this.hangupSvg_);
   }
 

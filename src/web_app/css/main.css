@@ -175,11 +175,14 @@ label {
 .remote_span{
   color: red;
   font-size: 18px;
+  height: 20px;
+  width: 120px;
   position: absolute;
 }
 .local_span{
   color: green;
   font-size: 18px;
+  width: 40px;
   position: absolute;
 }
 .has-remote{
