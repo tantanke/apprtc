@@ -372,7 +372,7 @@ AppController.prototype.transitionToWaiting_ = function () {
 
   this.hide_(this.hangupSvg_);
   // Rotate the div containing the videos -180 deg with a CSS transform.
-  this.deactivate_(this.videosDiv_);
+  /* this.deactivate_(this.videosDiv_); */
 
   if (!this.remoteVideoResetTimer_) {
     this.remoteVideoResetTimer_ = setTimeout(function () {
