@@ -172,6 +172,16 @@ label {
   width: 100vw;
   justify-content: center;
 }
+.remote_span{
+  color: red;
+  font-size: 18px;
+  position: absolute;
+}
+.local_span{
+  color: green;
+  font-size: 18px;
+  position: absolute;
+}
 .has-remote{
   min-height: 420px;
   border-bottom: 2px solid gainsboro;
