@@ -136,7 +136,6 @@ Call.prototype.hangup = function (async) {
   steps.push({
     step: function () {
       this.params_.previousRoomId = this.params_.roomId;
-      document.querySelector('.remote-videos').innerHTML = ''
       this.params_.roomId = null;
       this.rejoinTag = true
       this.params_.clientId = null;
