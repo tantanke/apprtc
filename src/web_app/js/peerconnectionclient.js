@@ -112,6 +112,7 @@ PeerConnectionClient.prototype.startAsCallee = function (initialMessages, connec
   if (this.started_) {
     return false;
   }
+  console.log('两人场景中作为callee被唤起')
   this.isInitiator_ = false;
   this.started_ = true;
   this.connectIDs = connectIDs
@@ -236,8 +237,8 @@ PeerConnectionClient.prototype.setLocalSdpAndNotify_ =
       this.onsignalingmessage({
         sdp: sessionDescription.sdp,
         type: sessionDescription.type,
-        localUserID: this.connectIDs.localUserID,
-        targetUserID: this.connectIDs.targetUserID
+        localUserID: this.connectIDs?.localUserID,
+        targetUserID: this.connectIDs?.targetUserID
       });
     }
   };
@@ -349,8 +350,8 @@ PeerConnectionClient.prototype.onIceCandidate_ = function (event) {
         label: event.candidate.sdpMLineIndex,
         id: event.candidate.sdpMid,
         candidate: event.candidate.candidate,
-        localUserID: this.connectIDs.localUserID,
-        targetUserID: this.connectIDs.targetUserID
+        localUserID: this.connectIDs?.localUserID,
+        targetUserID: this.connectIDs?.targetUserID
       };
       if (this.onsignalingmessage) {
         this.onsignalingmessage(message);
