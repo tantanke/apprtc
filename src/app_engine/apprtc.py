@@ -375,7 +375,7 @@ def add_client_to_room(request, room_id, client_id, is_loopback):
       room = memcache_client.gets(key)
 
     occupancy = room.get_occupancy()
-    if occupancy >= :
+    if occupancy >= MAX_Member:
       error = constants.RESPONSE_ROOM_FULL
       break
     if room.has_client(client_id):
